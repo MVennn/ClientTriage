@@ -160,6 +160,15 @@ ClientTriage/
    另外 `tools/clear-chrome-region.js` 里的 Chrome profile 路径仍是硬编码的
    （`C:/Users/<用户名>/AppData/Local/Google/Chrome/User Data`），换机器要改。
 
+## 记忆文档
+
+`memories/` —— **只靠读代码和文档读不出来的事实**：踩过的坑、根因、实测结论、
+已确认但未修的缺陷。同样的内容也存在于 ZCode 的记忆库（按项目 id 分目录），
+那里是活的，这里是**随 git 版本化的快照**。
+
+索引见 [memories/MEMORY.md](memories/MEMORY.md)，约定见
+[memories/README.md](memories/README.md)。
+
 ## 免责声明
 
 本项目仅供学习与个人排障使用。
