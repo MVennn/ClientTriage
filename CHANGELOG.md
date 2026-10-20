@@ -20,8 +20,8 @@
 
 ## [未发布] — 2026-10-20
 
-**本仓是首次建仓** —— 从 `F:\Project\Openwrt` 拆出。拆分前它是一个把
-「AX3000T 路由器运维 / ShellCrash 分流 / 现代控制台 / AI 模型接入 / PC 客户端排障」
+**本仓是首次建仓** —— 从原多仓工作区拆出。拆分前它是一个把
+「路由器系统运维 / ShellCrash 分流 / 现代控制台 / AI 模型接入 / PC 客户端排障」
 五个互不相关的逻辑任务混在同一个物理目录下的工作区；本次把其中**第 ⑤ 个逻辑任务
 （PC 客户端经代理访问境外服务的排障）**独立成一个可单独上传 GitLab 的仓库。
 
@@ -30,8 +30,8 @@
 
 ### 调整
 
-- 调整 仓库 —— 新建 `F:\Project\ClientTriage\`，作为 5 个拆分目标之一独立成仓；本仓只保留客户端侧的定位与取证能力
-- 调整 边界 —— 明确职责切分：本仓只做客户端侧定位与取证；路由器的 fake-IP 段 / nft 表 / 策略组 / 节点选择归 `AX3000TOpenwrt` 与 `ShellcrashRules` 两个仓
+- 调整 仓库 —— 新建独立仓，作为 5 个拆分目标之一独立成仓；本仓只保留客户端侧的定位与取证能力
+- 调整 边界 —— 明确职责切分：本仓只做客户端侧定位与取证；路由器的 fake-IP 段 / nft 表 / 策略组 / 节点选择归**路由器系统仓**与**分流规则仓**两个仓
 - 调整 工具 —— `tools/clear-chrome-region.js`（清 Chrome 地区种子）从原 `tools/` 迁入
 - 调整 工具 —— `tools/verify-gemini.sh`（Gemini 复测编排）从原 `tools/` 迁入
 - 调整 工具 —— `tools/cdp.js` 从原 `audit/cdp.js` 迁入 `tools/`，定位从「一次性审计产物」提升为「长期工具」
@@ -51,17 +51,45 @@
 - 调整 文档 —— 新增 `docs/release-notes/v0.1.0.md`：首版 Release 说明
 - 调整 文档 —— 新增根 `CHANGELOG.md`（本文件）、`NOTICE`、`.gitignore`
 
+### 调整（通用化批次）
+
+本仓从「某台设备（小米 AX3000T）的客户端排障笔记」改写为**通用方法仓** ——
+**方法**（怎么判断客户端问题还是路由器问题、怎么抓 CDP 控制台、怎么清地区种子、
+Chrome LNA 与 fake-IP 为什么冲突）与**复现环境**（当时那台设备的具体取值）分开写。
+
+- 调整 定位 —— 根 `README.md` 的一句话改为「PC 客户端经代理访问境外服务的排障方法与工具（Chrome / Google / Gemini）」；
+  「适用环境」改为通用前提（Windows + Chrome + 一个可达的代理 + 路由器 root 权限）；
+  新增「**已验证环境**」一节，集中记录实测机型与「兄弟仓对照」（角色名 ↔ 实际仓名）。
+- 调整 工具 —— `tools/verify-gemini.sh`：`CHROME` 改为环境变量 + **Windows 自动探测**
+  （常见安装路径 → `where chrome` → 注册表 App Paths），探测不到时明确报错并提示用 `CHROME` 指定；
+  临时 profile 目录改用系统临时目录（`$TMPDIR`/`$TEMP`）而不是写死用户路径；
+  新增 `ROUTER_IP` / `CDP_PORT` / `SIBLING_REPO` 环境变量；`SSID_ROUTER` / `SSID_HOTSPOT`
+  未设置时明确报错退出。
+- 调整 工具 —— `tools/clear-chrome-region.js`：Chrome 用户数据目录改为**自动探测**
+  （`%LOCALAPPDATA%\Google\Chrome\User Data`），支持 `CHROME_USER_DATA` 环境变量与首个命令行参数覆盖，
+  不再写死某台机器的用户目录。
+- 调整 文档 —— `docs/SECRETS.md` 重写：讲清**哪些设备标识会出现在哪、为什么要脱敏、怎么脱敏**
+  （MAC / IPv6 PD / ULA / WiFi 名 / 本机绝对路径 / 账号标识），并给出本仓统一的占位符写法；
+  凭据仍只写位置不写值。
+- 调整 文档 —— 各篇正本里的具体网段、机型、仓名改为通用措辞或占位符，
+  实测值集中到「已验证环境」；命令原文保持可直接复制执行（地址按示例标注）。
+- 调整 文档 —— 兄弟仓统一用角色名「**路由器系统仓**」/「**分流规则仓**」，
+  实际仓名只出现在「已验证环境」的对照表里。
+- 调整 文档 —— 删掉仓内的本机绝对路径（`C:\Users\<用户名>\...`、`F:\...`），
+  改成仓内相对路径或「原多仓工作区」这类不带机器信息的说法。
+
 ### 待补
 
 以下欠账**建仓时已知但未做**，逐条写明缺什么：
 
-- **`tools/verify-gemini.sh` 的兄弟仓依赖** —— 脚本用 `../../AX3000TOpenwrt/recovery/local-tools/askpass.sh`
-  与 `../../AX3000TOpenwrt/recovery/archive/verify-fix.sh` 找兄弟仓的文件，
+- **`tools/verify-gemini.sh` 的兄弟仓依赖** —— 脚本用 `../../<兄弟仓>/recovery/local-tools/askpass.sh`
+  与 `../../<兄弟仓>/recovery/archive/verify-fix.sh` 找兄弟仓的文件，
   本仓的 `tools/cdp.js` 与截图输出已经是仓内相对路径。
   **缺的是**一份「三个仓必须同级摆放」的说明 —— 已在根 README 的「已知坑」第 4 条写清，
-  并给出 `ASKPASS` / `VERIFY_FIX` 环境变量覆盖方式。
-- **`tools/clear-chrome-region.js` 的 Chrome profile 路径硬编码** —— 写死 `C:/Users/SansK/AppData/Local/Google/Chrome/User Data`。
-  **缺的是**「改成从环境变量 / 参数读取」的改动本身（本次不改既有脚本）；待改时按脚本约定补一行参数说明。
+  并给出 `SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 环境变量覆盖方式。
+- **`tools/clear-chrome-region.js` 的 Chrome profile 路径硬编码** —— 原先写死本机用户的 Chrome 用户数据目录。
+  **缺的是**「改成从环境变量 / 参数读取」的改动本身；通用化批次已改为**自动探测**
+  （`%LOCALAPPDATA%\Google\Chrome\User Data`），并支持 `CHROME_USER_DATA` 环境变量与首个命令行参数覆盖。
 - **`docs/CHROME-GOOGLE-诊断.md` 的过期声明** —— 该文写于 2026-10-19，结论是「方案 A/C/D 已落地并端到端验证」；
   2026-10-20 晚发现**同一 LNA 机制仍导致 Gemini「只剩输入框」**，最终修法是
   `fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`。

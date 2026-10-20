@@ -5,6 +5,11 @@
 
 机制细节见 [LNA-FAKE-IP.md](LNA-FAKE-IP.md)；测量方法本身的坑见 [PITFALLS.md](PITFALLS.md)。
 
+> **地址约定**：本篇命令里的 `10.0.0.1` 是**示例**的路由器 LAN 地址（典型家用路由默认网关），
+> `10.0.0.1:7890` 是示例的代理 mixed 口 —— **换成你自己网络里的地址**再跑。
+> 命令原文保持可直接复制执行，不写成伪代码；地址真值见根
+> [README.md](../README.md) 的「已验证环境」。
+
 ---
 
 ## 0. 先用这一条分诊
@@ -26,7 +31,7 @@ CDP_PORT=9223 node tools/cdp.js
 | ① 不通 | 先看是不是地区 / 出口问题 | 「Google 账号被判定为不支持的国家」节 |
 | ① 通、② 没有任何错误但页面仍不对 | 页面渲染被懒加载的子资源影响，但子资源没报错 | 用 DOM 快照确认 UI 是否完整 |
 | ① 在客户端不通、路由器上经 `127.0.0.1:7890` 通 | **客户端侧**（本机 DNS / hosts / 代理 / 浏览器） | 本节各节的「客户端侧自检」 |
-| 两边都不通 | **路由器侧**（分流 / 节点 / 防火墙） | `AX3000TOpenwrt` / `ShellcrashRules` |
+| 两边都不通 | **路由器侧**（分流 / 节点 / 防火墙） | 路由器系统仓 / 分流规则仓 |
 
 > **口径提醒**：路由器上 curl 必须经 `127.0.0.1:7890`；客户端上必须经 `10.0.0.1:7890`。
 > 两边各用自己的口，别混（见 [PITFALLS.md](PITFALLS.md) §5）。
@@ -120,7 +125,7 @@ Chrome 155 的 LNA 判成 `public → local` → 被 CORS 拒 → 只剩主 bund
 # ① 抓浏览器进程的网络日志（Chrome 必须完全退出后再起）
 "C:/Program Files/Google/Chrome/Application/chrome.exe" \
   --log-net-log=chrome-netlog.json --net-log-capture-mode=Everything \
-  --user-data-dir="C:/Users/<你>/AppData/Local/Temp/netlog-prof" \
+  --user-data-dir="$TEMP/netlog-prof" \
   "https://chromewebstore.google.com/detail/<扩展 id>"
 
 # 在 netlog 里搜这两个关键字
@@ -264,7 +269,7 @@ curl -s -m 10 -x http://10.0.0.1:7890 https://api.ipify.org
 
 ```sh
 # ④ 客户端侧自检：Chrome 的地区种子与旧地区页面缓存
-node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/Local State'); \
+node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Local State'); \
   console.log(j.variations_country, j.variations_permanent_consistency_country)"
 ```
 
@@ -274,7 +279,7 @@ node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/L
 
 1. **网络层（主因）**：**服务方看的是出口 IP 的注册地**。
    实测 28 个出口里 **27 个被 Google 判 `cc=CN`**（含美国 / 德国 / 英国机房段），
-   只有 `<REDACTED-EXIT-IP>`（注册地印度）判 `IN`。
+   只有注册地在印度的那一个判 `IN`。
    第三方 GeoIP 对每一个节点都与服务方分歧（JP/SG/HK/CA/UK/TW ↔ CN）—— **不可信**。
 2. **客户端层（次要）**：Chrome 自己缓存的 `variations_country` 种子仍是 `cn`
    （实测 `variations_country = "cn"`，`variations_permanent_consistency_country` 绑定当前 Chrome 版本）；
@@ -283,7 +288,7 @@ node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/L
 **解法**：
 
 - 网络层：把 Google 系流量统一指向**经 cc 实测判为非 CN 的出口**，
-  并把守护进程的复原判据从「出口名含香港」换成 **cc 探针**（正本在 `ShellcrashRules` 仓）。
+  并把守护进程的复原判据从「出口名含香港」换成 **cc 探针**（正本在分流规则仓）。
   实测里印度节点是唯一可用出口，且自建了同 IP 的另两个入口做冗余。
 - 客户端层：完全退出 Chrome 后清地区种子（`node tools/clear-chrome-region.js`），
   再清 Chrome 的「缓存的图片和文件」（时间范围选「不限时间」），

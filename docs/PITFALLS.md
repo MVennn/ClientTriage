@@ -6,6 +6,9 @@
 排某个具体现象怎么查，看 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)；
 根因机制看 [LNA-FAKE-IP.md](LNA-FAKE-IP.md)。
 
+> **地址约定**：本篇命令里的 `10.0.0.1` / `10.0.0.1:7890` 是**示例**的路由器 LAN 地址与代理 mixed 口，
+> **换成你自己网络里的地址**再跑；命令原文保持可直接复制执行。
+
 ---
 
 ## 1. Chrome 完全退出前改地区种子会被覆盖
@@ -41,7 +44,7 @@
   ```bash
   "C:/Program Files/Google/Chrome/Application/chrome.exe" \
     --remote-debugging-port=9223 \
-    --user-data-dir="C:/Users/<你>/AppData/Local/Temp/verify-prof" \
+    --user-data-dir="$TEMP/verify-prof" \
     --no-first-run --no-default-browser-check \
     --window-size=1280,800 "https://gemini.google.com/app"
   ```
@@ -113,10 +116,13 @@ curl -s -m 15 -x http://127.0.0.1:7890 -o /dev/null -w '%{redirect_url}\n' https
 **现象**：同一个节点，第三方 GeoIP 说日本，Google 说中国；换节点查 Google 判定却全是中国。
 
 **为什么**：**服务方看的是 IP 的注册地，不是机房位置。**
-实测这个机场的 28 个出口里，**27 个被 Google 判为 `cc=CN`**，
-包括 Linode 美国段 `<REDACTED-EXIT-IP>`、Hetzner 德国段 `<REDACTED-EXIT-IP>`、
-Azure 英国段 `<REDACTED-EXIT-IP>`；只有 `<REDACTED-EXIT-IP>`（DigitalOcean，注册地印度）判 `IN`。
+实测某个机场的 28 个出口里，**27 个被 Google 判为 `cc=CN`** ——
+包括美国机房段、德国机房段、英国机房段的出口（机房看着在境外，注册地却被判为中国）；
+只有一个注册地在印度的出口判 `IN`。
 而第三方库（ip-api / ip.sb / ip.guide）**全部**把它们标成 JP/SG/HK/CA/UK/TW。
+
+> 出口 IP 与节点名属 P2 级内部标识，正文用占位符；原始逐条数据在
+> `evidence/agents/agent-ip-reputation.md`（历史审计分片，原文保留）。
 
 **怎么避**：
 

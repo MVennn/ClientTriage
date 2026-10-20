@@ -59,7 +59,7 @@ Redir 模式只代理 TCP；`quic_rj=ON` 的实现只是 `udp dport {443,8443} r
   `generativelanguage.googleapis.com → 🤖 人工智能 → 🤖 AI网页 → 🇯🇵`。
 - `ai-api-check.sh` 全部通过（三协议 200）。
 - 备份：路由器 `/root/backup/pre-chrome-lna-fix/`；项目记录
-  `F:\Project\ClientTriage\docs\CHROME-GOOGLE-诊断.md` 与 `PROGRESS.md` 第四轮。
+  `docs/CHROME-GOOGLE-诊断.md` 与 `PROGRESS.md` 第四轮。
 
 ## 2026-10-19 21:46 追加：Play「全员等待中」的第二根因 — 下载 CDN 必须直连
 
@@ -291,8 +291,8 @@ live nft 规则、clash_modify.sh 的 tls override-destination、fake_ip_filter 
   这个 Meta 段），不能代表 LAN 客户端；判断客户端要用 `nslookup x 10.0.0.1` 或 `127.0.0.1:1053`。
 - **PC 断网时的兜底通道**：dropbear 只监听 IPv4（IPv6 22 端口 Connection refused），
   但 mihomo API 9999 在 IPv6 可用 → 用 mihomo 代理口做 HTTP CONNECT 隧道回 SSH：
-  `ssh -o "ProxyCommand=python connect_proxy.py <router-ipv6> 7890 %h %p" root@10.0.0.1`
-  （connect_proxy.py 在 `C:\Users\SansK\AppData\Local\Temp\owrt\`）。
+  `ssh -o "ProxyCommand=python connect_proxy.py <router-ipv6> 7890 %h %p" root@<路由器IP>`
+  （connect_proxy.py 在本机临时目录下，例如 `%TEMP%\owrt\`）。
 - **并行子代理会互相踩踏**：AGENTS.md 要求每个任务都写根目录 PROGRESS.md → 13 个代理并发写
   同一文件，后写覆盖前写（本次把 PROGRESS.md 覆盖过一次，已按记忆库重建）。
   派子代理时要明确让它们写各自独立文件。
@@ -509,7 +509,7 @@ Steam 说 JP、PrimeVideo 说 JP、Netflix 说 SG、OpenAI 放行、GitHub 只�
 - 浏览器/客户端层无残留阻断项：8 个扩展全查 manifest，AdGuard 的 77019 条 DNR 对 Google 域命中 0、
   无 UA 改写、无代理类扩展；只需用户自己清 Chrome 的 `variations_country="cn"` 种子与磁盘里
   旧的 `google.com.hk` 缓存页（`ipconfig /displaydns` 实测本机缓存为空，无需 flushdns）。
-- 复盘报告在 `F:\Project\AX3000TOpenwrt\evidence\agent-*.md`（11 份）。
+- 复盘报告在路由器系统仓的 `evidence/agent-*.md`（11 份）。
 
 ### 2026-10-20 11:45：通用池节点劣化 → 全站超时（第三种故障模式）
 
@@ -593,7 +593,7 @@ bundle 画出来的输入框。`gemini.google.com` 本身在 `+.google.com`（�
 - 用 **CDP** 抓控制台才是正道：起一个带 `--remote-debugging-port=<port>` + 临时
   `--user-data-dir` 的 Chrome，Node 用内置 `WebSocket` 连 `webSocketDebuggerUrl`，
   启用 `Log/Runtime/Network` → 读 `Log.entryAdded`、`Runtime.exceptionThrown`、
-  `Network.loadingFailed`。脚本在 `F:\Project\AX3000TOpenwrt\evidence\cdp.js`（`CDP_PORT`/`CDP_URL` 可覆盖）。
+  `Network.loadingFailed`。脚本在路由器系统仓的 `evidence/cdp.js`（`CDP_PORT`/`CDP_URL` 可覆盖）。
 - **别用 `--dump-dom` + grep 判断页面是否渲染**：DOM 里含 JS bundle 源码，
   grep 到的「认识 Gemini」可能只是脚本里的字符串 → **必须看截图或 `document.body.innerText`**。
 - 排除法顺序（本轮走过的弯路，别重复）：内置浏览器正常 ⇒ 链路 OK；headless 用**真实 profile 副本**

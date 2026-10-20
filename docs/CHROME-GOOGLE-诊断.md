@@ -85,12 +85,15 @@ ShellCrash 当前是 `redir_mod=Redir`：只做 TCP 重定向，UDP 不代理。
 `quic_rj=ON` 的实现只是 `udp dport {443,8443} return`，对 fake-IP 目标等于放行到一个
 不可路由地址，并不会给客户端任何快速失败信号。
 
-实测 conntrack（平板 10.0.0.x，以及 PC 10.0.0.37 点击安装时）：
+实测 conntrack（平板 `<平板LAN-IP>`，以及 PC `<PC-LAN-IP>` 点击安装时）：
 
 ```
-udp src=10.0.0.x dst=198.18.0.140 dport=443 ... [UNREPLIED]   # 无任何回包
-udp src=10.0.0.37 dst=198.18.0.105 dport=443 ... [UNREPLIED]   # 正是 lh3 的 fake-IP
+udp src=<平板LAN-IP> dst=198.18.0.140 dport=443 ... [UNREPLIED]   # 无任何回包
+udp src=<PC-LAN-IP> dst=198.18.0.105 dport=443 ... [UNREPLIED]   # 正是 lh3 的 fake-IP
 ```
+
+> 上面的内网地址已按 [docs/SECRETS.md](SECRETS.md) §3.3 的 P2 口径换成占位符 ——
+> 只换值、不改结构；命中的目标段（`198.18.0.0/15` 内的 fake-IP）与结论不变。
 
 `198.18.0.0/15`、`fc00::/16` 都不是本机路由可达地址，包发出去后无人应答。
 Android / Chrome 的 HTTP/3 会等到超时才回落 TCP；Play 商店的下载流程更容易卡在
@@ -185,7 +188,7 @@ Gemini/AI 端点继续走 `🤖 人工智能`。改完要同步 `ai-rules-update
 
 - 诊断用的临时 Chrome 已清理，没有改动日常 Chrome 配置。
 - 关键命令：
-  - 看 fake-IP：`nslookup lh3.googleusercontent.com 10.0.0.1`
+  - 看 fake-IP：`nslookup lh3.googleusercontent.com <路由器IP>`（示例地址 `10.0.0.1`）
   - 看 QUIC 黑洞：`grep "udp.*dport=443" /proc/net/nf_conntrack`
   - 看分组：`curl -s 127.0.0.1:9999/proxies | jsonfilter -e '@.proxies["🤖 人工智能"].now'`
   - Chrome netlog：`chrome.exe --log-net-log=... --net-log-capture-mode=Everything`，

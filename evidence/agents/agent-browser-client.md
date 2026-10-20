@@ -62,7 +62,7 @@ HKCU\...\Internet Settings: ProxyEnable : 0   ProxyServer : 127.0.0.1:7890(未�
 Cache/Cache_Data/f_000cab (362961 B) 内含：
   <a href="https://www.google.com.hk/webhp?hl=zh-CN" ...>
   https://www.google.com.hk/search?q=muse-spark-1.3-contributor
-  (已登录账号 ssanskritt@gmail.com)      <-- 修复前的旧 HK 区页面仍在缓存
+  (已登录账号 <REDACTED-account>)      <-- 修复前的旧 HK 区页面仍在缓存
 Code Cache/js/*: lightweight-web.composer.unsupported-image 等 = Gemini 自身 i18n 键，非报错页
 全 Default 目录 grep "not available in your country|unsupported country" = 0 命中
 Default/Network/ 无独立 host cache 文件(TransportSecurity 是 HSTS)
@@ -89,7 +89,7 @@ Get-DnsClientCache).Count      : 0
 ipconfig /displaydns           : 空输出
 => 本机 DNS 客户端缓存完全为空，无任何 Google 解析残留，无需 flushdns
 
-# 实时解析（Windows 侧 -> 10.0.0.1 -> ShellCrash/mihomo DNS）
+# 实时解析（Windows 侧 -> 路由器 DNS（示例网关地址 10.0.0.1） -> ShellCrash/mihomo DNS）
 gemini.google.com  -> 142.251.150.2, 2001:4860:4826:200:: ...   真实 Google IP
 www.google.com     -> 142.251.156.119, 2001:4860:4826:7700::   真实 Google IP
 clientservices.googleapis.com -> 198.18.0.71, fc00::46          mihomo fake-ip(正常)
@@ -120,7 +120,7 @@ bundle: boq-gemini-web-uiserver.BardChatUi.zh_CN...  (Gemini 官方简体中文�
 ## 建议（给用户可操作的步骤，不要代替用户执行）
 **需要用户动手**
 1. 清掉旧区域页面缓存：Chrome → `chrome://settings/clearBrowserData` → 选「缓存的图片和文件」→ 时间范围「不限时间」→ 清除。（消掉缓存里的 www.google.com.hk 页面；Code Cache 一并清掉更干净。）
-2. 修正 Chrome 自身的国家缓存（它现在仍写 cn）：完全退出 Chrome 后，由用户编辑 `C:\Users\SansK\AppData\Local\Google\Chrome\User Data\Local State`，删除 `variations_country`、`variations_permanent_consistency_country`、`variations_safe_seed_permanent_consistency_country`、`variations_safe_seed_session_consistency_country` 四个键后重启 Chrome；或等 Chrome 自动升级到新版本号（permanent consistency 按版本绑定，升级即重置）。同时重启 Chrome 即可让它重新抓取 seed（当前 Chrome 版本 155.0.8059.82，seed 上次抓取是修复前的 2026-10-19 18:04）。
+2. 修正 Chrome 自身的国家缓存（它现在仍写 cn）：完全退出 Chrome 后，由用户编辑 `%LOCALAPPDATA%\Google\Chrome\User Data\Local State`（即 `C:\Users\<你>\AppData\Local\Google\Chrome\User Data\Local State`），删除 `variations_country`、`variations_permanent_consistency_country`、`variations_safe_seed_permanent_consistency_country`、`variations_safe_seed_session_consistency_country` 四个键后重启 Chrome；或等 Chrome 自动升级到新版本号（permanent consistency 按版本绑定，升级即重置）。同时重启 Chrome 即可让它重新抓取 seed（当前 Chrome 版本 155.0.8059.82，seed 上次抓取是修复前的 2026-10-19 18:04）。
 3. 保持「安全 DNS = 关闭」：Chrome → 设置 → 隐私和安全 → 安全 → 使用安全 DNS → 关闭（当前已是 off，且未被策略锁定，勿改成「使用当前服务提供商」以免 DoH 与路由器的 fake-ip 冲突）。
 4. 可选：把 Windows 区域格式改为「英语（美国）」以避免账号地区推断/YouTube 仍偏中国 —— Windows 设置 → 时间和语言 → 语言和区域 → 区域格式。此项**不影响** Gemini 可用性，仅影响账号地区推断。
 5. 若想彻底排除扩展干扰而不用卸载：用 Chrome 无痕窗口或访客模式打开 `https://gemini.google.com/app` 验证。

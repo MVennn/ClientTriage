@@ -1,0 +1,11 @@
+image: debian:stable
+
+stages: [test]
+
+.python:
+  before_script:
+    - apt-get update && apt-get install -y nodejs npm
+  script:
+    - for f in $(find . -name '*.sh' -not -path './third-party/*'); do sh -n "$f"; done
+    - for f in $(find . -name '*.js' -not -path './third-party/*'); do node --check "$f"; done
+    - python3 tools/check-docs.py

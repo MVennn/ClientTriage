@@ -34,7 +34,7 @@ AS30058 FDCservers，第三方库均标 Tokyo/JP）判成 HK/CN —— 证据：
 - 无法在独立临时 profile 复现**已登录**的 Gemini 应用：复制 profile 后 Chrome 会丢弃
   v20（app-bound 加密）SID cookie（1368 → 13 行，SID 消失），因此拿不到用户看到的报错原文。
 - 已登录场景 headless 截图输出全黑（无 GPU 绘制），真实 profile 的 DOM 快照（831KB）只到
-  账号芯片（ssanskritt@gmail.com / Venn M），**未出现**任何国家报错文案。
+  账号芯片（<REDACTED-account> / Venn M），**未出现**任何国家报错文案。
 - 对默认 profile 的影响：曾用 `--user-data-dir=<真实 User Data>` 跑过 3 次 headless
   Chrome（dump-dom×2 + screenshot×1）。仅产生缓存/历史写入，未改设置/Cookie/扩展/站点数据。
   之后所有渲染均改用独立临时 profile。

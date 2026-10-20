@@ -4,7 +4,7 @@
 >
 > 本文件是本仓库**唯一**的进度台账（追加式批次日志）。
 > 规则正本见 [docs/DOC-RULES.md](docs/DOC-RULES.md) 与 [docs/MAINTENANCE.md](docs/MAINTENANCE.md)。
-> 拆分自原单文件 `PROGRESS.md`（2026-10-20 之前的 AX3000T 联合调优记录）。
+> 拆分自原单文件 `PROGRESS.md`（2026-10-20 之前的路由器联合调优记录）。
 
 ---
 
@@ -66,6 +66,55 @@
 
 ---
 
+
+---
+
+# 2026-10-20 通用化批次：方法与复现环境分离
+
+## 目标
+把本仓从「某台设备（小米 AX3000T）的客户端排障笔记」改写为**通用方法仓** ——
+正文只讲**方法**，具体实测值集中到根 README 的「已验证环境」。
+
+## 已完成变更
+- [x] `tools/verify-gemini.sh`：`CHROME` 改为环境变量 + Windows 自动探测
+      （常见安装路径 → `where chrome` → 注册表 App Paths），探测不到时明确报错；
+      临时 profile 改用 `$TMPDIR`/`$TEMP`；新增 `ROUTER_IP` / `CDP_PORT` / `SIBLING_REPO`；
+      `SSID_ROUTER` / `SSID_HOTSPOT` 未设置时明确报错退出。
+- [x] `tools/clear-chrome-region.js`：Chrome 用户数据目录改为自动探测
+      （`%LOCALAPPDATA%\Google\Chrome\User Data`），支持 `CHROME_USER_DATA` 与首个命令行参数。
+- [x] 根 README：一句话改为通用定位；「适用环境」改为通用前提；新增「已验证环境」
+      与「兄弟仓对照」（角色名 ↔ 实际仓名）。
+- [x] `docs/SECRETS.md` 重写：P2 类别表（MAC / IPv6 PD / ULA / WiFi 名 / 本机路径 / 账号标识）
+      + 占位符写法表 + 环境变量表；新增 §3.4 与 §3.5。
+- [x] 兄弟仓统一用角色名「路由器系统仓」/「分流规则仓」，实际仓名只出现在「已验证环境」。
+- [x] 删掉仓内本机绝对路径（`C:\Users\<用户名>\...`、`F:\...`）、账号标识、公开出口 IP。
+- [x] `docs/DOC-RULES.md` 新增 §3.1（只换值不改结构）与 §6（方法与复现环境分离），
+      原 §6/§7 顺延为 §7/§8；跨文件引用同步更新。
+- [x] `docs/MAINTENANCE.md`：分片红线补「只换值」的例外；对账清单补两条；
+      收尾清单的临时目录改用 `$TEMP`。
+- [x] `docs/TROUBLESHOOTING.md` / `docs/PITFALLS.md`：加「地址约定」引言，
+      地址统一按**示例**标注；命令原文保持可直接复制执行。
+- [x] `CHANGELOG.md`「未发布」段补「通用化批次」小节。
+
+## 刻意没改
+- `evidence/agents/*.md` 的**描述性内容**（结论、原始输出、节点名、机场出口表）——
+  按仓内红线「证据原文逐字保留」，只做了 P2 级的**值替换**：
+  账号标识 → `<REDACTED-account>`、本机用户名路径 → `%LOCALAPPDATA%\...`、
+  一处网关地址 → 标注为示例。**没有**任何能用来连上某个服务的凭据留在仓内。
+- `third-party/` —— vendored 上游，原样不动。
+- `memories/` 的历史事实（IP、机型、日期）—— 记忆快照的职责是「当时的结论」。
+
+## 自检
+- `bash -n tools/verify-gemini.sh` 通过；`node --check` 两个 `.js` 通过。
+- 28 个 md 的相对链接与锚点全部可达（无死链、无孤儿）。
+- 仓内已无 `C:\Users\<用户名>` / `F:\...` / 真实邮箱 / 公开出口 IP。
+
+## 待解决
+- `evidence/agents/agent-ip-reputation.md` 等分片里仍有节点出口 IP 与机场名（P2 级）。
+  按仓内规则它们是「历史证据原文」，**上传公开远端前**需按 `docs/SECRETS.md` §3.3 替换 ——
+  这一步本轮刻意没做，避免破坏证据链。
+
+## 状态: 已完成
 
 ---
 

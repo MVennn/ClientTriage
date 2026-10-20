@@ -1,15 +1,23 @@
 # ClientTriage
 
-> **可见性**：公开 —— 本机网络名已改为占位符 + 环境变量；仓内**零凭据、零设备标识**；vendored 只有 Chrome DevTools 协议定义（BSD-3-Clause）。
+> **可见性**：公开 —— 本机网络名、本机绝对路径、账号标识一律改为占位符 + 环境变量；
+> 仓内**零凭据**；vendored 只有 Chrome DevTools 协议定义（BSD-3-Clause）。
+> 证据分片里残留的 P2 级内部标识（出口 IP、内网地址等）按
+> [docs/SECRETS.md](docs/SECRETS.md) §3.3 处理。
 
-> **一句话**：PC 侧（Windows + Chrome）经路由器代理访问境外服务时的排障方法与工具 ——
+> **一句话**：**PC 客户端经代理访问境外服务的排障方法与工具（Chrome / Google / Gemini）** ——
 > 把「症状出在客户端还是路由器」这件事查清楚，并留下能复核的证据。
 
-**PC 侧客户端排障** —— Windows + Chrome 经路由器代理访问境外服务时，定位「症状出在客户端还是路由器」的方法与工具。
+**客户端侧排障方法** —— Windows + Chrome 经代理访问境外服务时，定位「症状出在客户端还是路由器」的方法与工具。
 
 本仓只做**客户端侧的定位与取证**：拿到能复现的命令、能对照的现象、能留存的证据。
-路由器的 fake-IP 段、nft 规则、策略组与节点选择属于另外两个仓（`AX3000TOpenwrt` 与
-`ShellcrashRules`），本仓不复制它们的配置细节，只在这里说明「哪一类症状要往那边走」。
+路由器的 fake-IP 段、nft 规则、策略组与节点选择属于**另外两个仓**（本仓称之为「路由器系统仓」
+与「分流规则仓」，见 [已验证环境](#已验证环境)），本仓不复制它们的配置细节，
+只在这里说明「哪一类症状要往那边走」。
+
+> **读法**：正文讲的是**方法**（通用，对任何「PC + 代理 + Chrome」的用户都成立）；
+> 具体到某台设备、某个网络、某个出口的实测值集中在 [已验证环境](#已验证环境) 一节。
+> 两者的分工是本仓的写作纪律，详见 [docs/DOC-RULES.md](docs/DOC-RULES.md)。
 
 ---
 
@@ -29,18 +37,49 @@ PC 端通过路由器上的透明代理（ShellCrash / mihomo）访问境外服�
    把「到底是谁在拦」这件事查清楚，并留下可复核的证据。
 
 > 一句话判据：**症状在浏览器里能被复现成一条控制台错误**，才轮得到本仓继续查；
-> 查不到就是网络层，去 `ShellcrashRules`。
+> 查不到就是网络层，去「分流规则仓」（见 [已验证环境](#已验证环境)）。
 
 ## 适用环境
+
+以下是**通用前提** —— 满足这几条，这套方法就能用；具体机型见下一节。
 
 | 项 | 要求 | 备注 |
 |---|---|---|
 | 操作系统 | Windows 10 / 11 | 工具链依赖 `netsh` / `ssh` / `curl`，**仅 Windows 可用** |
-| 浏览器 | Chrome 155（实测 155.0.8059.82） | LNA 机制自 Chrome 138+ 起生效；更早版本不会复现本仓的假-IP 冲突 |
-| Node.js | ≥ 18（实测 v24.13.1） | `tools/cdp.js` 用内置 `fetch` 与 `WebSocket`，无第三方依赖 |
+| 浏览器 | Chrome 138+ | LNA 机制自 Chrome 138+ 起生效；更早版本不会复现本仓的假-IP 冲突 |
+| Node.js | ≥ 18 | `tools/cdp.js` 用内置 `fetch` 与 `WebSocket`，无第三方依赖 |
 | Shell | Git Bash | `tools/verify-gemini.sh` 是 `sh` 脚本，依赖 `netsh` / `ssh` / `curl` |
-| 路由器 | `10.0.0.1` 可达，代理 mixed 口 `10.0.0.1:7890` 对 LAN 可用 | 本仓的 API/连通性测试**必须走这个口**，不能用路由器自身的 curl（见 [docs/PITFALLS.md](docs/PITFALLS.md)） |
+| 代理 | 一个**客户端可达**的代理口（路由器上的 mixed 口，或本机代理软件） | 本仓的 API/连通性测试**必须走这个口**，不能用路由器自身的 curl（见 [docs/PITFALLS.md](docs/PITFALLS.md)） |
+| 路由器 | 需 root 权限（要跑路由器侧检查脚本） | 路由器侧排查**不在本仓**，本仓只负责判据与证据 |
 | CDP 调试端口 | 9223（临时实例） | `tools/cdp.js` 默认 9222，用环境变量 `CDP_PORT` 覆盖 |
+
+> 文中出现的 `10.0.0.1` / `192.168.1.x` 一律是**示例网段**（典型的家用路由器默认网关），
+> 不是某个具体网络的真值。用你自己的网关地址替换即可。
+
+## 已验证环境
+
+以下是**方法被实测过的环境** —— 记录「当时是在什么环境上抓到的」，供复核与对照。
+换环境不影响方法本身，只影响下面这些具体取值。
+
+| 项 | 实测值 |
+|---|---|
+| 路由器 | 小米 AX3000T（刷 OpenWrt，跑 ShellCrash / mihomo） |
+| 路由器 LAN 地址 | `10.0.0.1`；代理 mixed 口 `10.0.0.1:7890`（家用路由器的常见默认段，换环境时按实际改） |
+| 客户端 | Windows 11 + Chrome 155.0.8059.82；Node.js v24.13.1；Git Bash |
+| 手机 / 平板 | 小米平板（Android），用于复现 Play 更新卡住 |
+| 出口 | 某机场订阅的多国出口节点池（28 个出口） |
+| 取证日期 | 2026-10-19 ~ 2026-10-20 |
+
+**兄弟仓对照**（正文一律用左列的角色名，右列是当时的实际仓名 —— 仓名里带设备型号，
+你自己的仓叫什么由你定）：
+
+| 本仓正文用的角色名 | 当时的实际仓名 | 管什么 |
+|---|---|---|
+| **路由器系统仓** | `AX3000TOpenwrt` | 设备本体：OpenWrt、sysupgrade 保留清单、SSH 口令脚本 |
+| **分流规则仓** | `ShellcrashRules` | 代理分流：fake-IP 段、nft 规则、策略组、节点选择 |
+
+> 本仓不记录具体 WiFi 名、MAC、IPv6 PD、出口 IP 等设备标识 ——
+> 哪些标识会出现在哪、为什么要脱敏、怎么脱敏，见 [docs/SECRETS.md](docs/SECRETS.md)。
 
 ## 快速开始
 
@@ -110,8 +149,8 @@ ClientTriage/
 
 | 工具 | 作用 | 副作用 | 前置条件 |
 |---|---|---|---|
-| `tools/clear-chrome-region.js` | 清掉 Chrome 的地区种子：`Local State` 与 `Default/Preferences` 里 5 个 `variations_*_country` 键（含 `variations.` 嵌套） | **改写 Chrome 配置文件**；写前先留 `.bak-region-<时间戳>` 备份 | **Chrome 已完全退出**（退出时会重写 Local State，在线改会被覆盖）；Node.js |
-| `tools/verify-gemini.sh` | 复测 Gemini：切 WiFi → SSH 跑路由器侧检查 → 起临时 Chrome（9223）→ CDP 抓日志 → 截图 → 清理并切回热点 | **会切换本机 WiFi**；会起一个临时 Chrome 进程；结束后删临时 profile；截图写到本仓 `evidence/gemini-after.png` | Git Bash；路由器 `10.0.0.1` 可达；**兄弟仓 `AX3000TOpenwrt` 要与本仓同级**（脚本用 `../../AX3000TOpenwrt/recovery/...` 找 `askpass.sh` 与 `verify-fix.sh`，可用 `ASKPASS` / `VERIFY_FIX` 环境变量覆盖） |
+| `tools/clear-chrome-region.js` | 清掉 Chrome 的地区种子：`Local State` 与 `Default/Preferences` 里 5 个 `variations_*_country` 键（含 `variations.` 嵌套） | **改写 Chrome 配置文件**；写前先留 `.bak-region-<时间戳>` 备份 | **Chrome 已完全退出**（退出时会重写 Local State，在线改会被覆盖）；Node.js；Chrome 目录自动探测，`CHROME_USER_DATA` 可覆盖 |
+| `tools/verify-gemini.sh` | 复测 Gemini：切 WiFi → SSH 跑路由器侧检查 → 起临时 Chrome（9223）→ CDP 抓日志 → 截图 → 清理并切回热点 | **会切换本机 WiFi**；会起一个临时 Chrome 进程；结束后删临时 profile；截图写到本仓 `evidence/gemini-after.png` | Git Bash；路由器可达（`ROUTER_IP`，默认 `192.168.1.1`）；**兄弟仓要与本仓同级**（脚本默认从 `../../<路由器系统仓>/recovery/...` 找 `askpass.sh` 与 `verify-fix.sh`，可用 `SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 覆盖） |
 | `tools/cdp.js` | 通过 CDP 接管**已在运行**的 Chrome，抓渲染状态、`Log.entryAdded`、`Runtime.consoleAPICalled`、`Runtime.exceptionThrown`、`Network.loadingFailed`、非 2xx 响应 | 无（只读；不碰浏览器设置、不改 profile） | Node.js ≥ 18；一个开着 `--remote-debugging-port` 的 Chrome；`CDP_PORT` / `CDP_URL` 可选覆盖 |
 
 ### 文档与证据
@@ -151,14 +190,16 @@ ClientTriage/
    headless 在无 GPU 的机器上可能截出一张全黑图。
 
 4. **兄弟仓必须与本仓同级，否则 `verify-gemini.sh` 跑不完。**
-   脚本用 `../../AX3000TOpenwrt/recovery/local-tools/askpass.sh`（SSH 口令）与
-   `../../AX3000TOpenwrt/recovery/archive/verify-fix.sh`（路由器侧检查）——
-   这两个文件**归 `AX3000TOpenwrt` 仓所有**。只把本仓 clone 到别处时，
+   脚本默认从 `../../<兄弟仓>/recovery/local-tools/askpass.sh`（SSH 口令）与
+   `../../<兄弟仓>/recovery/archive/verify-fix.sh`（路由器侧检查）找这两个文件 ——
+   它们**归路由器系统仓所有**。只把本仓 clone 到别处时，
    第 2 步（路由器侧检查）会因找不到文件而中断。
-   两种解法：把三个仓放在同一父目录下，或用环境变量覆盖：
+   三种解法：把本仓与路由器系统仓放在同一父目录下；用 `SIBLING_REPO` 指定仓目录名；
+   或直接用环境变量覆盖到具体文件：
    `ASKPASS=/path/to/askpass.sh VERIFY_FIX=/path/to/verify-fix.sh bash tools/verify-gemini.sh`。
-   另外 `tools/clear-chrome-region.js` 里的 Chrome profile 路径仍是硬编码的
-   （`C:/Users/<用户名>/AppData/Local/Google/Chrome/User Data`），换机器要改。
+   另外 `tools/clear-chrome-region.js` 现在会**自动探测** Chrome 的用户数据目录
+   （`%LOCALAPPDATA%\Google\Chrome\User Data`）；非标准安装位置用环境变量
+   `CHROME_USER_DATA` 或第一个命令行参数覆盖。
 
 ## 记忆文档
 
@@ -205,6 +246,15 @@ node third-party/verify-cdp-fields.js
 
 2026-10-20 实测全部命中（明细见
 [third-party/devtools-protocol/UPSTREAM.md](third-party/devtools-protocol/UPSTREAM.md) §3.1）。
+
+## 参与与治理
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) —— 工具怎么用、证据怎么加、**方法与复现环境分离**这条规矩
+- [SECURITY.md](SECURITY.md) —— 安全问题怎么报、脚本对浏览器与本机数据的影响
+- [tools/check-docs.py](tools/check-docs.py) —— 文档自检（链接 / 锚点 / 引言块 / 孤儿），CI 里跑的就是它
+- CI：`.gitlab-ci.yml`（shell / node 语法 + 文档自检）
+
+---
 
 ## 许可证
 

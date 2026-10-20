@@ -40,7 +40,7 @@
 
 ```sh
 # 清完、Chrome 重启后再读一次，确认真的没了
-node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/Local State'); \
+node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Local State'); \
   console.log(j.variations_country, j.variations_permanent_consistency_country)"
 ```
 
@@ -73,8 +73,14 @@ node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/L
 | Chrome 配置备份 `*.bak-region-*` | 保留最近 3 份 | 回滚用；多了分不清哪份对 |
 | 临时 Chrome profile（`%TEMP%\verify-prof`、`verify-shot`） | **每次跑完即删** | `tools/verify-gemini.sh` 的第 5 步负责删；删不掉就是脚本没跑完 |
 
-**红线**：`evidence/agents/` 下的分片**不许删、不许改写**。
+**红线**：`evidence/agents/` 下的分片**不许删、不许改写内容**。
 要修正内容就在新的分片里写，并让主会话更新正文档 —— 原文保留是证据链的一部分。
+
+> **例外（只换值，不改结构）**：分片里的 **P2 级设备标识**（出口 IP、内网地址、真实域名、
+> MAC / IPv6 PD、WiFi 名、本机绝对路径、账号标识）**可以替换成占位符或示例值** ——
+> 口径与写法见 [SECRETS.md](SECRETS.md) §3.3 / §3.4，边界见 [DOC-RULES.md](DOC-RULES.md) §3.1。
+> 换的只有值：**报错原文、错误码、命令与参数、判定数值、结论一个字都不动**。
+> 证据里若出现能用来连上某个服务的凭据（订阅链接、节点 uuid、口令），**必须脱敏**。
 
 ## 4. 工具脚本的副作用必须在 README 的显著位置声明
 
@@ -106,8 +112,13 @@ node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/L
 - [ ] 根 [CHANGELOG.md](../CHANGELOG.md) 的「未发布」段记录了本轮所有改动；
 - [ ] 根 [PROGRESS.md](../PROGRESS.md) 追加了本轮批次（一节，含状态与待解决）；
 - [ ] 事实与命令原文没有被改写（见 [DOC-RULES.md](DOC-RULES.md) §3）；
-- [ ] 指向其它仓的引用写的是**仓库名**（`AX3000TOpenwrt` / `ShellcrashRules`），
+- [ ] 指向其它仓的引用写的是**仓库名**（路由器系统仓 / 分流规则仓），
       不是物理路径；
+- [ ] 正文里没有绑定具体环境的取值（机型、网段、出口、仓名）——
+      这些只应出现在根 README 的「已验证环境」（见 [DOC-RULES.md](DOC-RULES.md) §6）；
+- [ ] 仓内没有本机绝对路径、账号标识等 P2 级设备标识
+      （见 [SECRETS.md](SECRETS.md) §3.3）；
+- [ ] 脚本新增/改名的环境变量已登记在 [SECRETS.md](SECRETS.md) §3.5；
 - [ ] `.gitignore` 覆盖了新出现的产物类型，且**没有误伤源码与文档**。
 
 ## 6. 收尾清单
@@ -118,11 +129,10 @@ node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/L
    但主会话的汇总要等它们都结束）；
 2. 跑一遍 §5 的文档对账清单；
 3. 清理过期日志（保留 7 天内）与多余备份（保留最近 3 份）；
-4. 确认临时 Chrome profile 已删干净：
+4. 确认临时 Chrome profile 已删干净（目录在系统临时目录下，`%TEMP%`）：
 
    ```bash
-   ls -d "C:/Users/<你>/AppData/Local/Temp/verify-prof" \
-         "C:/Users/<你>/AppData/Local/Temp/verify-shot" 2>/dev/null
+   ls -d "$TEMP/verify-prof" "$TEMP/verify-shot" 2>/dev/null
    # 有输出就删掉：rm -rf 上面两个目录
    ```
 
@@ -151,4 +161,4 @@ node -e "const j=require('C:/Users/<你>/AppData/Local/Google/Chrome/User Data/L
 |---|---|---|
 | 2026-10-19 | Chrome LNA 拦截 fake-IP 的诊断与路由器侧修复（`fake_ip_filter` 加 Google 域、`quicguard.nft`、Play CDN 按 IP 分流） | 扩展安装恢复；**但「已修复」结论不完整** —— 同一机制仍导致 Gemini 只剩输入框 |
 | 2026-10-20 | Google 地区判定全量实测（28 个出口逐个测 cc）；Gemini「只剩输入框」的真根因定位（islands bundle 被 LNA/CORS 拦）；`fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`（共 21 条） | Gemini 恢复（用户确认「gemini 修好了」）；**但判据当时仍有缺陷**（靠「外壳能打开」结案），补在 [LNA-FAKE-IP.md](LNA-FAKE-IP.md) §5 |
-| 2026-10-20 | **本仓建仓**：从 `F:\Project\Openwrt` 拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitLab、独立看懂 |
+| 2026-10-20 | **本仓建仓**：从原多仓工作区拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitLab、独立看懂 |
