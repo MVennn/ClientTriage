@@ -1,0 +1,61 @@
+# ---- 凭据与证书：绝不入库 ----
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+*.keystore
+*.jks
+id_rsa
+id_ed25519
+.env
+.env.*
+!.env.example
+
+# ---- 浏览器配置备份（clear-chrome-region.js 在 Chrome profile 目录里生成，
+#      万一被拷进仓库也不能入库）----
+*.bak-region-*
+Local State
+Local State.bak*
+
+# ---- 大体积一次性产物 ----
+/evidence/*.png
+/evidence/**/*.png
+*.log
+*.log.*
+npm-debug.log*
+yarn-error.log*
+
+# ---- 运行时与依赖 ----
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# ---- 临时工作区 ----
+/tmp/
+/work/
+/.work/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# ---- 编辑器与 IDE ----
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 本地索引（CodeGraph 等）----
+.codegraph/
+
+# 注意：源码（tools/）、文档（docs/）、证据分片（evidence/agents/*.md）
+# 一律**不排除** —— 它们是本仓的价值所在。
+
+# ---- 脱敏未完成前的临时拦截（见 PRIVACY-INVENTORY.md）----

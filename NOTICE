@@ -1,0 +1,80 @@
+client-triage
+PC 侧客户端经代理访问境外服务的排障方法与工具。
+
+This product includes software developed as part of the client-triage project,
+a personal troubleshooting repository for client-side (Windows + Chrome) issues
+behind a router-side proxy.
+
+==============================================================================
+Third-party components
+==============================================================================
+
+The components below are used as **runtime dependencies / external tools**,
+unless the entry explicitly says otherwise. Their own licenses govern them.
+One project is vendored into this repository; it is listed first, and its
+full source credential (upstream URL, commit SHA, clone date, update
+procedure) lives in third-party/devtools-protocol/UPSTREAM.md.
+
+- Chrome DevTools Protocol (CDP) -- devtools-protocol
+  https://github.com/ChromeDevTools/devtools-protocol
+  https://chromedevtools.github.io/devtools-protocol/
+  Licensed under the BSD-3-Clause License.
+  Used for: the authoritative protocol definition behind tools/cdp.js -- the
+  script talks to a running Chrome instance over the DevTools WebSocket
+  endpoint and reads Log.entryAdded, Runtime.consoleAPICalled,
+  Runtime.exceptionThrown, Network.loadingFailed and Network.responseReceived
+  events to turn a vague symptom ("the page only shows an input box") into a
+  concrete console error.
+  Distribution: **yes** -- the protocol definition files (json/browser_protocol.json,
+  json/js_protocol.json) plus the upstream LICENSE and README are vendored
+  verbatim under third-party/devtools-protocol/ at commit
+  95b1af69d6a20161dc3558f8e38366b7fa7a27d1 (2026-10-19). Not one byte of
+  upstream content was modified. It is a read-only reference: no script in
+  tools/ requires anything from that directory.
+  The full index of vendored projects, and the reasoning for each, is in
+  third-party/README.md.
+
+- Chrome / Chromium
+  https://www.chromium.org/Chromium/Chromium/
+  Licensed under the BSD-3-Clause License (Chromium authors).
+  Used for: the browser under diagnosis. It provides the
+  `--remote-debugging-port` entry point that tools/cdp.js attaches to, and it
+  is the component whose Local Network Access (LNA) check conflicts with the
+  router-side fake-IP address space -- see docs/LNA-FAKE-IP.md.
+  Distribution: **no** -- not vendored, not redistributed.
+  Chrome is a trademark of Google LLC; this project is not affiliated with,
+  endorsed by, or sponsored by Google LLC.
+
+- Node.js
+  https://nodejs.org/
+  Licensed under the MIT License.
+  Used for: tools/cdp.js and tools/clear-chrome-region.js. Both scripts rely only
+  on Node built-ins (global fetch, global WebSocket, fs, path) and declare no
+  third-party npm dependencies.
+  Distribution: **no** -- not vendored, not redistributed.
+
+
+==============================================================================
+Acknowledgements
+==============================================================================
+
+- The Windows command-line utilities invoked by tools/verify-gemini.sh
+  (netsh, ssh, curl, ping) are part of the operating system / Git for Windows
+  and are not redistributed here.
+- The troubleshooting technique "read the service's own country marker instead
+  of a third-party GeoIP database" was contributed by the parallel read-only
+  audit passes archived under evidence/agents/. Their raw reports are kept
+  verbatim in this repository as evidence.
+
+==============================================================================
+Scope and responsibility
+==============================================================================
+
+This repository contains diagnostic tooling only. It does not bypass, defeat or
+circumvent any access control, region restriction or anti-abuse mechanism of
+any third party. The scripts modify local browser configuration only, and they
+create a backup (Local State.bak-region-<timestamp>) before writing.
+
+The maintainers accept no responsibility for the consequences of use. Users are
+responsible for complying with applicable law and with the terms of service of
+every service they access.
