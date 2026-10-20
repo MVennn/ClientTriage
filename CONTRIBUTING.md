@@ -12,7 +12,7 @@ node tools/clear-chrome-region.js
 SSID_ROUTER=你的WiFi名 SSID_HOTSPOT=你的热点名 bash tools/verify-gemini.sh
 ```
 
-两个脚本都**有副作用**，跑之前看清楚 `docs/SECRETS.md` 与本仓 README 的「已知坑」。
+两个脚本都**有副作用**，跑之前看清楚 `docs/SECRETS.md` 与 `docs/TOOLS.md`（坑位见 `docs/PITFALLS.md`）。
 
 ## 加证据
 

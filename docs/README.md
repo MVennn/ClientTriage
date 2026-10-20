@@ -20,7 +20,8 @@
 |---|---|
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | 排错手册（**正本**）：按现象检索，每节「现象 → 排查步骤 → 原因/解法」，并给「客户端问题还是路由器问题」的判据 |
 | [PITFALLS.md](PITFALLS.md) | 踩坑总汇（**正本**）：每条写清「为什么错」与「下次怎么避」，含判定方法本身的坑 |
-| [MAINTENANCE.md](MAINTENANCE.md) | 维护流程（**正本**）：种子要能重复执行、证据命名与保留期限、工具副作用的声明位置 |
+| [MAINTENANCE.md](MAINTENANCE.md) | 维护流程（**正本**）：种子要能重复执行、证据命名与保留期限、副作用变更的同步义务 |
+| [TOOLS.md](TOOLS.md) | 工具清单（**正本**）：tools/ 三个工具的作用 / 副作用 / 前置条件登记表 |
 
 ## 三、规范
 
@@ -35,10 +36,11 @@
 
 | 位置 | 一句话定位 |
 |---|---|
+| [VERIFIED-ENV.md](VERIFIED-ENV.md) | 已验证环境：方法被实测过的设备、网段、出口快照与兄弟仓名对照 |
 | [CHROME-GOOGLE-诊断.md](CHROME-GOOGLE-诊断.md) | 2026-10-19 的阶段性诊断报告：Chrome LNA 拦截 fake-IP 导致扩展安装 `Image decode failed`、Play 更新转圈的证据链；⚠️ 其「已修复」结论已被 [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 修正，读时以 LNA-FAKE-IP 为准 |
 | [archive/](archive/) | 一次性归档目录（**当前为空**）：阶段性结论的原文留档处，不进索引条目 |
 | `../evidence/agents/` | 9 份子代理只读审计分片：浏览器层、干净出口方案、IP 声誉、Google 其余服务、OpenAI、流媒体与开发者站点、社交媒体、YouTube、PC 侧 —— 原始证据，**结论已被上面的正本吸收，但原文逐字保留** |
-| `../tools/` | 三个工具脚本（清地区种子 / Gemini 复测编排 / CDP 抓控制台）：用法与副作用见根 [README.md](../README.md) 的「文件清单」 |
+| `../tools/` | 三个工具脚本（清地区种子 / Gemini 复测编排 / CDP 抓控制台）：用法与副作用见 [TOOLS.md](TOOLS.md) |
 | 仓库根 [CHANGELOG.md](../CHANGELOG.md) | 开发者记录：建仓动作、结论修正、待补欠账（**版本号本身**在这里维护，规则见 [VERSIONING.md](VERSIONING.md)） |
 | 仓库根 [PROGRESS.md](../PROGRESS.md) | 本仓唯一进度台账（追加式批次日志）：目标 / 步骤勾选 / 状态 / 待解决 |
 | 仓库根 [LICENSE](../LICENSE) | 许可证全文（**MIT**）—— 与根 [NOTICE](../NOTICE) 的第三方声明配套（本仓**不含**任何 GPL-3.0 派生件） |

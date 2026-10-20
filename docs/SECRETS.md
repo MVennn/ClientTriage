@@ -129,7 +129,7 @@ tools/verify-gemini.sh
 | **`ROUTER_PASSWORD`** | **不在本仓** —— 由兄弟仓的 `recovery/local-tools/askpass.sh` 读 | 无 | 那个脚本报错退出（exit 1），不静默 |
 
 > `tools/cdp.js` 的 `CDP_PORT` / `CDP_URL` 与凭据**无关**（只是 Chrome 调试端口），
-> 不列进本表；用法见根 [README.md](../README.md) 的「文件清单」。
+> 不列进本表；用法见 [TOOLS.md](TOOLS.md)。
 >
 > `verify-gemini.sh` 另外会自己设 `SSH_ASKPASS_REQUIRE=force` 与 `DISPLAY=:0` ——
 > 这两个是 ssh 的行为开关，**不含口令**。
@@ -191,7 +191,7 @@ git diff --cached | grep -nE 'C:[/\\]Users[/\\]|/Users/[A-Za-z0-9._-]+/|[A-Za-z0
 |---|---|
 | 兄弟仓的凭据位置与轮换（**设备侧真源**） | 路由器系统仓的 `docs/SECRETS.md` |
 | mihomo secret 与节点凭据的存放位置 | 分流规则仓的 `docs/SECRETS.md` |
-| 工具的用法、副作用、前置条件 | 根 [README.md](../README.md) 的「文件清单」 |
+| 工具的用法、副作用、前置条件 | [TOOLS.md](TOOLS.md) |
 | 证据逐字保留的红线、内部标识怎么处理 | [DOC-RULES.md](DOC-RULES.md) §3、§3.1 |
 | 方法与复现环境怎么分开写 | [DOC-RULES.md](DOC-RULES.md) §6 |
 | 版本号与发版 | [VERSIONING.md](VERSIONING.md) |

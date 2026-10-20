@@ -118,3 +118,24 @@
 
 ---
 
+# 2026-10-21 README 收敛 + 流水线修复
+
+## 背景
+- 参照系列仓 gsauxiliary 的门面格式，根 `README.md` 收敛为面向用户的说明；
+  开发者向内容（文件清单 / 已验证环境 / 已知坑摘要 / 目录结构 / 记忆文档）下沉 `docs/` 或删除。
+- `.gitlab-ci.yml` 只定义了隐藏模板 `.python`（无可见作业），流水线零作业、创建即失败。
+
+## 已完成变更
+- [x] 重写根 `README.md`：logo 头 + 徽章 / 这是什么 / 适用环境 / 使用 / 反馈 / 免责声明 / 开源鸣谢 / 许可证
+- [x] 新增 `docs/TOOLS.md`（工具清单正本）与 `docs/VERIFIED-ENV.md`（已验证环境快照），进索引
+- [x] DOC-RULES / MAINTENANCE / SECRETS / TROUBLESHOOTING / VERSIONING / docs/README / CONTRIBUTING 引用同步改指新位置
+- [x] 重写 `.gitlab-ci.yml`：`shell-js-syntax` + `docs` 两个真实作业
+- [x] CHANGELOG 增补「README 收敛批次」
+
+## 自检
+- `python tools/check-docs.py` ✓（19 篇：链接 / 锚点 / 引言块 / 孤儿）
+- `node --check` 两个工具脚本、`sh -n verify-gemini.sh` ✓
+
+## 状态: 已完成
+
+---

@@ -78,6 +78,22 @@ Chrome LNA 与 fake-IP 为什么冲突）与**复现环境**（当时那台设�
 - 调整 文档 —— 删掉仓内的本机绝对路径（`C:\Users\<用户名>\...`、`F:\...`），
   改成仓内相对路径或「原多仓工作区」这类不带机器信息的说法。
 
+### 调整（README 收敛批次，2026-10-21）
+
+参照系列仓 gsauxiliary 的门面格式，把根 `README.md` 收敛为**面向用户**的说明
+（这是什么 / 适用环境 / 使用 / 反馈 / 免责声明 / 开源鸣谢 / 许可证），
+开发者向的内容下沉到 `docs/`：
+
+- 调整 文档 —— 新增 `docs/TOOLS.md`：工具清单**正本**（作用 / 副作用 / 前置条件三列），
+  取代原根 README 的「文件清单」表；「已知坑」不再在 README 重复，统一看 `docs/PITFALLS.md`
+- 调整 文档 —— 新增 `docs/VERIFIED-ENV.md`：已验证环境快照与兄弟仓名对照，
+  取代原根 README 的「已验证环境」一节
+- 调整 文档 —— `docs/DOC-RULES.md` / `MAINTENANCE.md` / `SECRETS.md` / `TROUBLESHOOTING.md` /
+  `VERSIONING.md` / `docs/README.md` / `CONTRIBUTING.md` 里指向根 README
+  「文件清单 / 已知坑 / 已验证环境」的引用，同步改指新位置
+- 修复 CI —— `.gitlab-ci.yml` 原先只定义了隐藏模板 `.python`、没有任何可见作业，
+  流水线一创建就失败（零作业）；改为 `shell-js-syntax` 与 `docs` 两个真实作业
+
 ### 待补
 
 以下欠账**建仓时已知但未做**，逐条写明缺什么：
@@ -85,8 +101,8 @@ Chrome LNA 与 fake-IP 为什么冲突）与**复现环境**（当时那台设�
 - **`tools/verify-gemini.sh` 的兄弟仓依赖** —— 脚本用 `../../<兄弟仓>/recovery/local-tools/askpass.sh`
   与 `../../<兄弟仓>/recovery/archive/verify-fix.sh` 找兄弟仓的文件，
   本仓的 `tools/cdp.js` 与截图输出已经是仓内相对路径。
-  **缺的是**一份「三个仓必须同级摆放」的说明 —— 已在根 README 的「已知坑」第 4 条写清，
-  并给出 `SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 环境变量覆盖方式。
+  **缺的是**一份「三个仓必须同级摆放」的说明 —— 已在 `docs/TOOLS.md` 工具表的
+  前置条件列写清，并给出 `SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 环境变量覆盖方式。
 - **`tools/clear-chrome-region.js` 的 Chrome profile 路径硬编码** —— 原先写死本机用户的 Chrome 用户数据目录。
   **缺的是**「改成从环境变量 / 参数读取」的改动本身；通用化批次已改为**自动探测**
   （`%LOCALAPPDATA%\Google\Chrome\User Data`），并支持 `CHROME_USER_DATA` 环境变量与首个命令行参数覆盖。

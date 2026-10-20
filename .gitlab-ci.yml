@@ -2,10 +2,20 @@ image: debian:stable
 
 stages: [test]
 
-.python:
+variables:
+  GIT_DEPTH: "20"
+
+shell-js-syntax:
+  stage: test
   before_script:
     - apt-get update && apt-get install -y nodejs npm
   script:
     - for f in $(find . -name '*.sh' -not -path './third-party/*'); do sh -n "$f"; done
     - for f in $(find . -name '*.js' -not -path './third-party/*'); do node --check "$f"; done
+
+docs:
+  stage: test
+  before_script:
+    - apt-get update && apt-get install -y python3
+  script:
     - python3 tools/check-docs.py

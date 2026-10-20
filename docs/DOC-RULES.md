@@ -38,7 +38,7 @@ docs/ 分四类（索引见 [README.md](README.md)）：
 | 文档规则（分类 / 正本 / 链接 / 触发矩阵） | [DOC-RULES.md](DOC-RULES.md)（本篇） |
 | Release 说明格式与固定尾巴 | [release-notes/README.md](release-notes/README.md) |
 | 版本命名规则 | [VERSIONING.md](VERSIONING.md) §1–§2 |
-| 工具的用法、副作用、前置条件 | 根 [README.md](../README.md)「文件清单」 |
+| 工具的用法、副作用、前置条件 | [TOOLS.md](TOOLS.md) |
 | 子代理写文件的规则、客户端与路由器的边界 | 根 [AGENTS.md](../AGENTS.md) |
 | 建仓动作与欠账 | 根 [CHANGELOG.md](../CHANGELOG.md)「未发布」段 |
 
@@ -58,7 +58,7 @@ docs/ 分四类（索引见 [README.md](README.md)）：
 3. **路由器侧配置不复制进本仓**：
    fake-IP 段、nft 表、策略组名、节点名会随路由器配置变化。
    本仓只写**结论与判据**，具体配置归**路由器系统仓**与**分流规则仓**
-   （角色名与实际仓名的对照见根 [README.md](../README.md) 的「已验证环境」）。
+   （角色名与实际仓名的对照见 [VERIFIED-ENV.md](VERIFIED-ENV.md)）。
 
 ## 3. 红线内容保护：实测证据逐字保留
 
@@ -107,14 +107,14 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
 |---|---|
 | 新增 / 删除 / 改名一篇文档 | [README.md](README.md) 索引（见 §7） |
 | LNA 机制、fake-IP 段、解法、判据有变 | [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 正文 + [TROUBLESHOOTING.md](TROUBLESHOOTING.md) 对应现象节 |
-| 新增一个工具脚本 | 根 [README.md](../README.md)「文件清单」表（作用 / 副作用 / 前置条件三列都要补） |
-| 工具的副作用变了（会切 WiFi、会写配置、会起进程） | 根 [README.md](../README.md)「已知坑」+ [MAINTENANCE.md](MAINTENANCE.md) 副作用声明段 |
+| 新增一个工具脚本 | [TOOLS.md](TOOLS.md)（作用 / 副作用 / 前置条件三列都要补） |
+| 工具的副作用变了（会切 WiFi、会写配置、会起进程） | [TOOLS.md](TOOLS.md) 副作用列 + [PITFALLS.md](PITFALLS.md) + [MAINTENANCE.md](MAINTENANCE.md) 副作用声明段 |
 | 新增一条踩坑 | [PITFALLS.md](PITFALLS.md)；若它同时是某现象的成因，补一条 [TROUBLESHOOTING.md](TROUBLESHOOTING.md) 的指向 |
 | 结论被推翻 / 修正 | 正本文档正文 + 根 [CHANGELOG.md](../CHANGELOG.md) 的「未发布」段；**旧结论保留在原文里**并标注被谁修正 |
 | 发版 | 根 [CHANGELOG.md](../CHANGELOG.md) + `docs/release-notes/<版本>.md`（格式正本：[release-notes/README.md](release-notes/README.md)） |
 | 证据文件新增 / 删除 | [MAINTENANCE.md](MAINTENANCE.md) 的命名与保留期限段（保持口径一致） |
 | 子代理新增分片 | 根 [AGENTS.md](../AGENTS.md) §1 只在**规则**变了时才动；分片清单在 [README.md](../README.md) 与索引里 |
-| 脚本新增 / 改名环境变量 | 根 [README.md](../README.md)「文件清单」表 + [SECRETS.md](SECRETS.md) §3.5 的环境变量表 |
+| 脚本新增 / 改名环境变量 | [TOOLS.md](TOOLS.md) + [SECRETS.md](SECRETS.md) §3.5 的环境变量表 |
 | 出现新的设备标识类别 | [SECRETS.md](SECRETS.md) §3.3 的 P2 类别表 + §3.4 的占位符写法表 |
 
 ## 6. 方法与复现环境必须分开
@@ -125,13 +125,13 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
 | 类别 | 写在哪 | 怎么写 |
 |---|---|---|
 | **方法**（怎么判断客户端问题还是路由器问题、命令、判据） | 各篇正本正文 | 通用措辞；地址用**示例值**并标注「示例」；命令原文可直接复制执行 |
-| **复现环境**（当时那台设备、那个网络、那个出口的实测值） | 根 [README.md](../README.md) 的「**已验证环境**」 | 集中一处，不散落在正文里 |
+| **复现环境**（当时那台设备、那个网络、那个出口的实测值） | [VERIFIED-ENV.md](VERIFIED-ENV.md) | 集中一处，不散落在正文里 |
 
 判断标准：**换一个环境，这段话还成立吗？**
 
 - 成立 → 属于**方法**，留在正文；
 - 不成立（绑定了具体机型 / 网段 / 出口 / 仓名） → 属于**复现环境**，
-  移到「已验证环境」，正文改写成通用措辞。
+  移到 [VERIFIED-ENV.md](VERIFIED-ENV.md)，正文改写成通用措辞。
 
 具体的设备标识（WiFi 名、MAC、IPv6 PD、内网地址、账号）**哪都不写** ——
 按 [SECRETS.md](SECRETS.md) §3.3 脱敏。

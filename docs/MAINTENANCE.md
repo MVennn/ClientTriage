@@ -1,7 +1,7 @@
 # 维护流程
 
 > **一句话**：本仓的「日常维护」只做三件事 —— **让地区种子能重复执行**、
-> **管住证据文件的去留**、**把工具脚本的副作用写在 README 的显眼位置**。
+> **管住证据文件的去留**、**把工具脚本的副作用登记在 [TOOLS.md](TOOLS.md)**。
 
 文档规则（新增 / 删除文档要连带改哪些）在 [DOC-RULES.md](DOC-RULES.md)；
 排障步骤在 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)。
@@ -34,7 +34,7 @@
 | **幂等** —— 没有种子时不报错 | `tools/clear-chrome-region.js` 打印「（本来就没有地区键）」并正常退出 |
 | **先备份后写** | 每次写前复制 `Local State` / `Preferences` 为 `.bak-region-<时间戳>` |
 | **可重复** —— 跑第二遍不会把别的配置弄坏 | 只删 5 个 `variations_*_country` 键（含 `variations.` 嵌套），其余键原样保留 |
-| **前置条件显式** | 脚本头注释写明「必须在 Chrome 完全退出时运行」；README「已知坑」第 1 条重申 |
+| **前置条件显式** | 脚本头注释写明「必须在 Chrome 完全退出时运行」；[PITFALLS.md](PITFALLS.md) 有对应坑位 |
 
 **每次清完必须复验**，别只信脚本输出：
 
@@ -82,21 +82,21 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 > 换的只有值：**报错原文、错误码、命令与参数、判定数值、结论一个字都不动**。
 > 证据里若出现能用来连上某个服务的凭据（订阅链接、节点 uuid、口令），**必须脱敏**。
 
-## 4. 工具脚本的副作用必须在 README 的显著位置声明
+## 4. 工具脚本的副作用必须登记在 docs/TOOLS.md
 
-**规则**：任何脚本只要会**改用户机器上的状态**，它的副作用必须同时出现在根
-[README.md](../README.md) 的两个地方 ——「文件清单」表的**副作用**列，和「已知坑」段。
+**规则**：任何脚本只要会**改用户机器上的状态**，它的副作用必须登记在
+[TOOLS.md](TOOLS.md) 的工具表**副作用**列，并在 [PITFALLS.md](PITFALLS.md) 有对应坑位。
 
 **当前三个工具的副作用登记**：
 
-| 脚本 | 副作用 | README 位置 |
+| 脚本 | 副作用 | 登记位置 |
 |---|---|---|
-| `tools/clear-chrome-region.js` | 改写 Chrome 的 `Local State` 与 `Default/Preferences`（写前留 `.bak-region-<ts>` 备份） | 文件清单表「副作用」列 + 已知坑 §1 |
-| `tools/verify-gemini.sh` | **切换本机 WiFi**（切到路由器 → 切回热点）；起一个临时 Chrome 进程；删临时 profile；截图写到本仓 `evidence/gemini-after.png` | 文件清单表「副作用」列 + 已知坑 §4 |
-| `tools/cdp.js` | 无（只读；连的是已经起好的 Chrome） | 文件清单表「副作用」列 |
+| `tools/clear-chrome-region.js` | 改写 Chrome 的 `Local State` 与 `Default/Preferences`（写前留 `.bak-region-<ts>` 备份） | [TOOLS.md](TOOLS.md) 工具表 + [PITFALLS.md](PITFALLS.md) |
+| `tools/verify-gemini.sh` | **切换本机 WiFi**（切到路由器 → 切回热点）；起一个临时 Chrome 进程；删临时 profile；截图写到本仓 `evidence/gemini-after.png` | [TOOLS.md](TOOLS.md) 工具表 + [PITFALLS.md](PITFALLS.md) |
+| `tools/cdp.js` | 无（只读；连的是已经起好的 Chrome） | [TOOLS.md](TOOLS.md) 工具表 |
 
 **新增或改动副作用时**，按 [DOC-RULES.md](DOC-RULES.md) §5 的触发矩阵同步四处：
-根 README 的文件清单表、根 README 的已知坑、本篇 §4 的表、本篇 §5 的文档对账清单。
+[TOOLS.md](TOOLS.md) 工具表、[PITFALLS.md](PITFALLS.md)、本篇 §4 的表。
 
 **特别提醒**：`verify-gemini.sh` 会**把本机 WiFi 切走**。
 在别人正在用这台机器、或机器上跑着依赖网络的任务时，**不要跑它**。
@@ -107,15 +107,15 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 
 - [ ] `docs/README.md` 的索引与 `docs/` 实际文件一一对应（**无孤儿、无死链**）；
 - [ ] 每篇文档开头都有 `> **一句话**：…` 引言块；
-- [ ] 根 README 的「文件清单」表与 `tools/` 实际文件一一对应；
-- [ ] 根 README 的「目录结构」树与实际目录一致（空目录不列）；
+- [ ] [TOOLS.md](TOOLS.md) 工具表与 `tools/` 实际文件一一对应；
+- [ ] `tools/` 脚本头注释的用法与 [TOOLS.md](TOOLS.md) 描述一致；
 - [ ] 根 [CHANGELOG.md](../CHANGELOG.md) 的「未发布」段记录了本轮所有改动；
 - [ ] 根 [PROGRESS.md](../PROGRESS.md) 追加了本轮批次（一节，含状态与待解决）；
 - [ ] 事实与命令原文没有被改写（见 [DOC-RULES.md](DOC-RULES.md) §3）；
 - [ ] 指向其它仓的引用写的是**仓库名**（路由器系统仓 / 分流规则仓），
       不是物理路径；
 - [ ] 正文里没有绑定具体环境的取值（机型、网段、出口、仓名）——
-      这些只应出现在根 README 的「已验证环境」（见 [DOC-RULES.md](DOC-RULES.md) §6）；
+      这些只应出现在 [VERIFIED-ENV.md](VERIFIED-ENV.md)（见 [DOC-RULES.md](DOC-RULES.md) §6）；
 - [ ] 仓内没有本机绝对路径、账号标识等 P2 级设备标识
       （见 [SECRETS.md](SECRETS.md) §3.3）；
 - [ ] 脚本新增/改名的环境变量已登记在 [SECRETS.md](SECRETS.md) §3.5；
@@ -151,7 +151,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 - **证据原文**：`evidence/agents/*.md` 的全部内容（含原始输出、报错原文、命令）；
 - **`docs/CHROME-GOOGLE-诊断.md`**：阶段性结论原文，即使结论已过期 —— 过期由索引与
   [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 标注，**不删不改**；
-- **`tools/` 三个脚本的逻辑**：它们是别人正在用的入口，改行为前先在根 README 里改副作用声明；
+- **`tools/` 三个脚本的逻辑**：它们是别人正在用的入口，改行为前先改 [TOOLS.md](TOOLS.md) 的副作用列；
 - **你日常 Chrome 的 profile**：只允许清 5 个 `variations_*_country` 键；
 - **任何凭据**：本仓不应出现明文口令、订阅链接、节点 UUID。
 
