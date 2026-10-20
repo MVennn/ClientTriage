@@ -84,6 +84,8 @@ Chrome LNA 与 fake-IP 为什么冲突）与**复现环境**（当时那台设�
 （这是什么 / 适用环境 / 使用 / 反馈 / 免责声明 / 开源鸣谢 / 许可证），
 开发者向的内容下沉到 `docs/`：
 
+- 调整 文档 —— 根 README 顶部去掉「一句话」引言块，门面定位由副标题承担（对齐 gsauxiliary）；`tools/check-docs.py` 同步豁免根 README 的引言块检查
+
 - 调整 文档 —— 新增 `docs/TOOLS.md`：工具清单**正本**（作用 / 副作用 / 前置条件三列），
   取代原根 README 的「文件清单」表；「已知坑」不再在 README 重复，统一看 `docs/PITFALLS.md`
 - 调整 文档 —— 新增 `docs/VERIFIED-ENV.md`：已验证环境快照与兄弟仓名对照，
