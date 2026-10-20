@@ -2,9 +2,11 @@
 # verify-gemini.sh — 复测 Gemini 页面（Chrome LNA 修复是否生效）+ 路由器侧检查
 # 用全新临时 profile 起一个带调试端口的 Chrome（不碰用户自己的浏览器）
 set -u
-SSID_ROUTER="MVenn"
-SSID_HOTSPOT="Xiaomi 17 Pro"
-ROUTER_IP="10.0.0.1"
+# 本机网络名：默认写占位符，用环境变量覆盖（SSID_ROUTER / SSID_HOTSPOT）。
+# 仓库公开时不要把真实 WiFi 名写进来。
+SSID_ROUTER="${SSID_ROUTER:-YOUR_ROUTER_SSID}"
+SSID_HOTSPOT="${SSID_HOTSPOT:-YOUR_HOTSPOT_SSID}"
+ROUTER_IP="${ROUTER_IP:-10.0.0.1}"
 CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe"
 TMPPROF="C:/Users/SansK/AppData/Local/Temp/verify-prof"
 HERE="$(cd "$(dirname "$0")" && pwd)"
