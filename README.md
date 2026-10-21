@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://gitlab.com/M.Venn/ClientTriage/-/raw/main/assets/logo.png" width="128" alt="ClientTriage">
+<img src="https://raw.githubusercontent.com/MVennn/ClientTriage/main/assets/logo.png" width="128" alt="ClientTriage">
 
 # ClientTriage
 
@@ -8,7 +8,7 @@
 
 先查客户端，再怪路由器。
 
-![流水线](https://gitlab.com/M.Venn/ClientTriage/badges/main/pipeline.svg) ![源码仓库](https://img.shields.io/badge/源码仓库-GitLab-FC6D26?logo=gitlab&logoColor=white) ![问题反馈](https://img.shields.io/badge/问题反馈-Issues-FC6D26?logo=gitlab&logoColor=white) ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows&logoColor=white) ![Chrome](https://img.shields.io/badge/Chrome-138%2B-4285F4?logo=googlechrome&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white) ![License](https://img.shields.io/badge/License-MIT-blue)
+![CI](https://github.com/MVennn/ClientTriage/actions/workflows/ci.yml/badge.svg) ![源码仓库](https://img.shields.io/badge/源码仓库-GitHub-181717?logo=github&logoColor=white) ![问题反馈](https://img.shields.io/badge/问题反馈-Issues-181717?logo=github&logoColor=white) ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows&logoColor=white) ![Chrome](https://img.shields.io/badge/Chrome-138%2B-4285F4?logo=googlechrome&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white) ![License](https://img.shields.io/badge/License-MIT-blue)
 
 </div>
 
@@ -31,7 +31,7 @@ Google 账号被判定为不支持的国家、流媒体打不开、社交媒体�
 
 一句话判据：**症状在浏览器里能被复现成一条控制台错误**，才轮得到本仓继续查；
 查不到就是网络层 —— 路由器侧的排查（fake-IP 段、分流规则、策略组）不在本仓范围，
-按现象直奔 [排错手册](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/docs/TROUBLESHOOTING.md)，
+按现象直奔 [排错手册](https://github.com/MVennn/ClientTriage/blob/main/docs/TROUBLESHOOTING.md)，
 每一节都给了「客户端问题还是路由器问题」的判据。
 
 ## 适用环境
@@ -73,21 +73,21 @@ CDP_PORT=9223 node tools/cdp.js
 | `tools/cdp.js` | 通过 CDP 接管已在运行的 Chrome，抓渲染状态、控制台错误、网络失败（只读） |
 
 已知坑与解法（Chrome 不退出改不上种子、CDP 要用临时实例、截图绿 ≠ 修好了等）见
-[踩坑总汇](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/docs/PITFALLS.md)；
+[踩坑总汇](https://github.com/MVennn/ClientTriage/blob/main/docs/PITFALLS.md)；
 机制与判据的来龙去脉见
-[LNA × fake-IP](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/docs/LNA-FAKE-IP.md)。
+[LNA × fake-IP](https://github.com/MVennn/ClientTriage/blob/main/docs/LNA-FAKE-IP.md)。
 
 ## 反馈
 
 遇到对不上的现象、想要新的判定手法，或某一步在你的环境里走不通，
-都可以到 [Issues](https://gitlab.com/M.Venn/ClientTriage/-/issues) 反馈。请尽量带上：
+都可以到 [Issues](https://github.com/MVennn/ClientTriage/issues) 反馈。请尽量带上：
 
 - Chrome 版本号、Windows 版本、代理方式（路由器透明代理还是本机代理软件）
 - 哪个工具、执行的哪一步，输出原文
 - 控制台错误原文（`tools/cdp.js` 的输出）或复现步骤
 
-想参与贡献，见 [CONTRIBUTING](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/CONTRIBUTING.md)；
-安全问题按 [SECURITY](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/SECURITY.md) 报告。
+想参与贡献，见 [CONTRIBUTING](https://github.com/MVennn/ClientTriage/blob/main/CONTRIBUTING.md)；
+安全问题按 [SECURITY](https://github.com/MVennn/ClientTriage/blob/main/SECURITY.md) 报告。
 
 ## 免责声明
 
@@ -109,11 +109,11 @@ CDP_PORT=9223 node tools/cdp.js
 
 | 项目 | 用途 |
 |---|---|
-| [**Chrome DevTools Protocol**](https://chromedevtools.github.io/devtools-protocol/) | 抓控制台、网络失败与页面渲染状态的标准协议；协议定义原文已随仓 vendor 在 [third-party/devtools-protocol/](https://gitlab.com/M.Venn/ClientTriage/-/tree/main/third-party/devtools-protocol)，`tools/cdp.js` 用到的每个方法与字段都可用 `node third-party/verify-cdp-fields.js` 逐个核对 |
+| [**Chrome DevTools Protocol**](https://chromedevtools.github.io/devtools-protocol/) | 抓控制台、网络失败与页面渲染状态的标准协议；协议定义原文已随仓 vendor 在 [third-party/devtools-protocol/](https://github.com/MVennn/ClientTriage/tree/main/third-party/devtools-protocol)，`tools/cdp.js` 用到的每个方法与字段都可用 `node third-party/verify-cdp-fields.js` 逐个核对 |
 | [**Chrome**](https://www.chromium.org/Chromium/Chromium/) | 被诊断的浏览器本体，提供 `--remote-debugging-port` 接入点 |
 | [**Node.js**](https://nodejs.org/) | 跑全部工具（内置 `fetch` / `WebSocket`，无第三方依赖） |
 
 ## 许可证
 
-本仓库以 [MIT License](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/LICENSE) 发布。
-第三方组件的版权与许可证声明见 [NOTICE](https://gitlab.com/M.Venn/ClientTriage/-/blob/main/NOTICE)。
+本仓库以 [MIT License](https://github.com/MVennn/ClientTriage/blob/main/LICENSE) 发布。
+第三方组件的版权与许可证声明见 [NOTICE](https://github.com/MVennn/ClientTriage/blob/main/NOTICE)。

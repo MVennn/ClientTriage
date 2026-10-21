@@ -23,7 +23,7 @@
 **本仓是首次建仓** —— 从原多仓工作区拆出。拆分前它是一个把
 「路由器系统运维 / ShellCrash 分流 / 现代控制台 / AI 模型接入 / PC 客户端排障」
 五个互不相关的逻辑任务混在同一个物理目录下的工作区；本次把其中**第 ⑤ 个逻辑任务
-（PC 客户端经代理访问境外服务的排障）**独立成一个可单独上传 GitLab 的仓库。
+（PC 客户端经代理访问境外服务的排障）**独立成一个可单独上传 GitHub 的仓库。
 
 本段只记录**建仓动作**与**建仓时就已经知道的欠账**，不重复既有诊断结论
 （结论见 [docs/CHROME-GOOGLE-诊断.md](docs/CHROME-GOOGLE-诊断.md) 与 `evidence/agents/`）。
@@ -93,8 +93,8 @@ Chrome LNA 与 fake-IP 为什么冲突）与**复现环境**（当时那台设�
 - 调整 文档 —— `docs/DOC-RULES.md` / `MAINTENANCE.md` / `SECRETS.md` / `TROUBLESHOOTING.md` /
   `VERSIONING.md` / `docs/README.md` / `CONTRIBUTING.md` 里指向根 README
   「文件清单 / 已知坑 / 已验证环境」的引用，同步改指新位置
-- 修复 CI —— `.gitlab-ci.yml` 原先只定义了隐藏模板 `.python`、没有任何可见作业，
-  流水线一创建就失败（零作业）；改为 `shell-js-syntax` 与 `docs` 两个真实作业
+- 修复 CI —— 当时的流水线配置只定义了隐藏模板 `.python`、没有任何可见作业，
+  流水线一创建就失败（零作业）；改为 shell/JS 语法与文档两组真实作业
 
 ### 待补
 

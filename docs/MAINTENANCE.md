@@ -161,4 +161,4 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 |---|---|---|
 | 2026-10-19 | Chrome LNA 拦截 fake-IP 的诊断与路由器侧修复（`fake_ip_filter` 加 Google 域、`quicguard.nft`、Play CDN 按 IP 分流） | 扩展安装恢复；**但「已修复」结论不完整** —— 同一机制仍导致 Gemini 只剩输入框 |
 | 2026-10-20 | Google 地区判定全量实测（28 个出口逐个测 cc）；Gemini「只剩输入框」的真根因定位（islands bundle 被 LNA/CORS 拦）；`fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`（共 21 条） | Gemini 恢复（用户确认「gemini 修好了」）；**但判据当时仍有缺陷**（靠「外壳能打开」结案），补在 [LNA-FAKE-IP.md](LNA-FAKE-IP.md) §5 |
-| 2026-10-20 | **本仓建仓**：从原多仓工作区拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitLab、独立看懂 |
+| 2026-10-20 | **本仓建仓**：从原多仓工作区拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitHub、独立看懂 |
