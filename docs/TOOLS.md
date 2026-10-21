@@ -10,3 +10,8 @@
 
 环境变量清单（含脱敏口径）见 [SECRETS.md](SECRETS.md) §3.5；
 每个工具对应的已知坑见 [PITFALLS.md](PITFALLS.md)，副作用变更时的同步义务见 [MAINTENANCE.md](MAINTENANCE.md) §4。
+
+`tools/cdp.js` 用到的每个 CDP 方法与事件字段，都对着**随仓 vendor 的协议定义快照**
+（`third-party/devtools-protocol/json/`）逐个核对过：核对脚本是
+[`third-party/verify-cdp-fields.js`](../third-party/verify-cdp-fields.js)，
+上游来源、vendored commit 与更新办法见 [third-party/README.md](../third-party/README.md)。

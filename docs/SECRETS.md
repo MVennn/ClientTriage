@@ -19,7 +19,7 @@
 
 > **兄弟仓的叫法**：本仓正文把两个配套仓分别叫「**路由器系统仓**」与「**分流规则仓**」——
 > 路由器系统仓管设备本体（OpenWrt、askpass 等），分流规则仓管代理分流规则（nft、策略组、节点）。
-> 跨仓分工的完整口径见根 [README.md](../README.md) 与根 [AGENTS.md](../AGENTS.md)：
+> 跨仓分工的完整口径见根 [AGENTS.md](../AGENTS.md) §2 与 [TROUBLESHOOTING.md](TROUBLESHOOTING.md) §0：
 > 路由器侧的 fake-IP 段 / nft 表 / 策略组 / 节点选择归那两个仓，本仓只做客户端侧的定位与取证。
 
 ---

@@ -139,3 +139,29 @@
 ## 状态: 已完成
 
 ---
+
+---
+
+# 2026-10-21 README 门面重写（对齐 gsauxiliary）
+
+## 目标
+用户反馈「readme 还是和 goldsunenhance 差很多，太乱七八糟」——
+按系列仓 GSAuxiliary 的门面格式重写根 `README.md`，
+开发者向内容（三个工具的详细说明表 / 示例网段说明 / 一句话判据长解释）下沉 `docs/`。
+
+## 已完成变更
+- [x] 根 `README.md` 重写为 84 行门面：`这是什么` / `环境要求` / `使用` / `反馈` / `免责声明` /
+      `开源鸣谢` / `许可证`；顶部 logo + 徽章，无目录树、无文件清单、无工具详情表。
+- [x] 三个工具的作用 / 副作用 / 前置条件：README 只留速览 + 链接，正本留在 `docs/TOOLS.md`。
+- [x] CDP 的 vendored 协议快照与 `verify-cdp-fields.js` 说明下沉到 `docs/TOOLS.md`，
+      README「开源鸣谢」表里压成一句话。
+- [x] 示例网段（`10.0.0.1` / `192.168.1.x`）说明下沉到 `docs/VERIFIED-ENV.md`（新增「地址口径」节）。
+- [x] 「一句话判据」全文下沉到 `docs/TROUBLESHOOTING.md` §0，README 只留一句概述 + 链接。
+- [x] `docs/DOC-RULES.md` 正本映射表补两行（分诊判据 / 示例地址约定），变更触发矩阵补一行。
+- [x] `docs/SECRETS.md`、`docs/release-notes/README.md` 里指向根 README 章节的引用改指正本。
+
+## 自检
+- `python tools/check-docs.py` ✓（19 篇：链接 / 锚点 / 引言块 / 孤儿），退出码 0。
+- 根 README 84 行（要求区间 80–110）；README 里所有仓库内链接目标均存在；未链 `docs/README.md` 索引。
+
+## 状态: 已完成

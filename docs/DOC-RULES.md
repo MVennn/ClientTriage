@@ -33,12 +33,14 @@ docs/ 分四类（索引见 [README.md](README.md)）：
 |---|---|
 | LNA × fake-IP 的机制、解法与判据 | [LNA-FAKE-IP.md](LNA-FAKE-IP.md) |
 | 排错步骤（现象 → 排查 → 原因/解法） | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) |
+| 客户端 / 路由器的分诊判据 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) §0 |
 | 踩坑清单与「下次怎么避」 | [PITFALLS.md](PITFALLS.md) |
 | 维护流程、保留期限、证据命名 | [MAINTENANCE.md](MAINTENANCE.md) |
 | 文档规则（分类 / 正本 / 链接 / 触发矩阵） | [DOC-RULES.md](DOC-RULES.md)（本篇） |
 | Release 说明格式与固定尾巴 | [release-notes/README.md](release-notes/README.md) |
 | 版本命名规则 | [VERSIONING.md](VERSIONING.md) §1–§2 |
 | 工具的用法、副作用、前置条件 | [TOOLS.md](TOOLS.md) |
+| 示例网段约定与实测环境快照 | [VERIFIED-ENV.md](VERIFIED-ENV.md) |
 | 子代理写文件的规则、客户端与路由器的边界 | 根 [AGENTS.md](../AGENTS.md) |
 | 建仓动作与欠账 | 根 [CHANGELOG.md](../CHANGELOG.md)「未发布」段 |
 
@@ -115,6 +117,7 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
 | 证据文件新增 / 删除 | [MAINTENANCE.md](MAINTENANCE.md) 的命名与保留期限段（保持口径一致） |
 | 子代理新增分片 | 根 [AGENTS.md](../AGENTS.md) §1 只在**规则**变了时才动；分片清单在 [README.md](../README.md) 与索引里 |
 | 脚本新增 / 改名环境变量 | [TOOLS.md](TOOLS.md) + [SECRETS.md](SECRETS.md) §3.5 的环境变量表 |
+| 根 README 的「使用」步骤或「环境要求」变了 | [TOOLS.md](TOOLS.md) 前置条件 + [VERIFIED-ENV.md](VERIFIED-ENV.md) 地址口径 |
 | 出现新的设备标识类别 | [SECRETS.md](SECRETS.md) §3.3 的 P2 类别表 + §3.4 的占位符写法表 |
 
 ## 6. 方法与复现环境必须分开
