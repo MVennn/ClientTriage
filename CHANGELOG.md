@@ -11,6 +11,17 @@
 
 ## [未发布] — 2026-10-21 ~ 2026-10-23
 
+### 工具前置检查（2026-10-23）
+
+- 修复 `tools/clear-chrome-region.js` —— 文件头第 2 行要求「必须在 Chrome 完全
+  退出时运行」，代码却从不检查。Chrome 开着时改动会在退出时被整体写回，
+  等于白改（还白留一份完整配置备份）。现在检测到 `chrome.exe` 直接退出并提示
+  从托盘完全退出
+- 修复 `tools/check-secrets.py` —— 占位符整行短路改为只豁免匹配片段
+- 验证 —— `node --check` ✓、`sh -n` ✓、`check-docs.py` ✓（19 篇）、
+  `check-secrets.py` ✓（58 个文件）
+
+
 ### 文档骨架对齐 GSAuxiliary（2026-10-22）
 
 按基准仓 `docs/DOC-RULES.md` / `docs/README.md` / `docs/VERSIONING.md` / `docs/release-notes/README.md` 的口径同步本仓文档骨架。**只改文档，未动代码 / 脚本 / CI 逻辑。**

@@ -7,6 +7,23 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const { execFileSync } = require("child_process");
+
+// 文件头第 2 行是硬前提：Chrome 退出时会把 Local State 整体写回，
+// 在线改等于白改。这里先确认没有 chrome.exe 在跑，不做静默覆盖。
+function chromeRunning() {
+  try {
+    const out = execFileSync(
+      "tasklist",
+      ["/FI", "IMAGENAME eq chrome.exe", "/NH", "/FO", "CSV"],
+      { encoding: "utf8" }
+    );
+    return /"chrome\.exe"/i.test(out);
+  } catch (e) {
+    if (e.status === 1) return false;
+    throw e;
+  }
+}
 
 function defaultUserDataDir() {
   const candidates = [];
@@ -38,6 +55,11 @@ const keys = [
 ];
 
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+if (chromeRunning()) {
+  console.error("Chrome 正在运行：请先从托盘完全退出 Chrome（不是只关窗口），再重新执行。");
+  console.error("在线改 Local State 会被 Chrome 退出时整体写回，等于没改。");
+  process.exit(1);
+}
 for (const f of files) {
   if (!fs.existsSync(f)) {
     console.log("跳过(不存在):", f);
