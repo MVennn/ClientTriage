@@ -149,7 +149,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 ## 7. 红线（一律不动）
 
 - **证据原文**：`evidence/agents/*.md` 的全部内容（含原始输出、报错原文、命令）；
-- **`docs/CHROME-GOOGLE-诊断.md`**：阶段性结论原文，即使结论已过期 —— 过期由索引与
+- **`docs/CHROME-GOOGLE-DIAGNOSIS.md`**：阶段性结论原文，即使结论已过期 —— 过期由索引与
   [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 标注，**不删不改**；
 - **`tools/` 三个使用者脚本的逻辑**（`clear-chrome-region.js` / `verify-gemini.sh` / `cdp.js`）：它们是别人正在用的入口，改行为前先改 [TOOLS.md](TOOLS.md) 的副作用列；
 - **你日常 Chrome 的 profile**：只允许清 5 个 `variations_*_country` 键；

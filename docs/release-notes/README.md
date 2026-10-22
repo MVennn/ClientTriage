@@ -1,13 +1,16 @@
 # release-notes/
 
-> **一句话**：这里放**面向使用者**的 Release 说明，文件名 = 版本号；
+> **一句话**：这里放**面向使用者**的 Release 说明，文件名 = `versionName`；
 > 格式规则只在本篇定义一次。
 
-放**面向使用者的** Release 说明，文件名 = 版本号：
+放**面向使用者的** Release 说明，文件名 = `versionName`（**不带 `v`**）：
 
 ```
-docs/release-notes/v0.1.0.md
+docs/release-notes/0.1.0.md
 ```
+
+**文件名不带 `v`** —— `v` 前缀只属于发版 tag（`v0.1.0`）；
+Release 说明文件名就是版本号本身（`0.1.0.md`）。
 
 版本号规则见 [VERSIONING.md](../VERSIONING.md) §1–§2（唯一正本）；
 版本号本身在根 [CHANGELOG.md](../../CHANGELOG.md) 的版本标题里维护。

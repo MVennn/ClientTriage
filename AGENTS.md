@@ -64,10 +64,12 @@
 ## 4. 其它硬约束
 
 - **不 `git init`、不 `git add`、不提交**：除非用户明确要求。仓库当前的版本控制状态由用户决定。
-- **不改既有文件**：本仓已有的 `tools/`、`evidence/`、`docs/CHROME-GOOGLE-诊断.md`、`PROGRESS.md`
+- **不改既有文件**：本仓已有的 `tools/`、`evidence/`、`docs/CHROME-GOOGLE-DIAGNOSIS.md`、`PROGRESS.md`
   默认一律不动。要改先说清理由。
 - **不编内容**：写不出来的结论写「待补」并说明**缺什么证据**，不要用推测填空。
 - **简体中文**；务实、给结论、给证据。
-- **单篇 ≤ 800 行**（见 [docs/DOC-RULES.md](docs/DOC-RULES.md) §7）。
+- **单篇 ≤ 800 行**（见 [docs/DOC-RULES.md](docs/DOC-RULES.md) §8）。
+- `docs/` 下的文件名一律**全大写 + 连字符**（如 `CHROME-GOOGLE-DIAGNOSIS.md`），
+  改名走 `git mv` + 全仓 grep 同步引用（见 [docs/DOC-RULES.md](docs/DOC-RULES.md) §7）。
 - 所有链接用**相对链接 + 半角括号**，锚点必须真实存在。
 - 每篇文档开头必须有 `> **一句话**：…` 引言块。

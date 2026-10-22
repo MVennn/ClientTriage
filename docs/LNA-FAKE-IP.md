@@ -6,7 +6,7 @@
 > 扩展安装报 `Image decode failed` 的共同根因。
 
 > **本文是长期正本**。2026-10-19 的阶段性诊断见
-> [CHROME-GOOGLE-诊断.md](CHROME-GOOGLE-诊断.md)，其中「方案 A/C/D 已落地并端到端验证」
+> [CHROME-GOOGLE-DIAGNOSIS.md](CHROME-GOOGLE-DIAGNOSIS.md)，其中「方案 A/C/D 已落地并端到端验证」
 > 的结论**已被本文修正** —— 同一机制在 10-19 之后仍导致 Gemini 故障。
 
 ---
@@ -215,7 +215,7 @@ islands bundle 被拒时，主 bundle 已经把输入框画出来了 ——
 
 | 证据 | 在哪 |
 |---|---|
-| 2026-10-19 完整诊断（含 netlog 片段、Chromium 源码引用、方案 A/C/D） | [CHROME-GOOGLE-诊断.md](CHROME-GOOGLE-诊断.md) |
+| 2026-10-19 完整诊断（含 netlog 片段、Chromium 源码引用、方案 A/C/D） | [CHROME-GOOGLE-DIAGNOSIS.md](CHROME-GOOGLE-DIAGNOSIS.md) |
 | 浏览器层逐项排除（扩展 / 策略 / 代理 / DoH / hosts / DNS 缓存 / profile） | `../evidence/agents/agent-browser-client.md` |
 | Chrome 地区种子与旧 HK 页面缓存的定位 | `../evidence/agents/agent-pc-side.md` |
 | 2026-10-20 晚「Gemini 只剩输入框」的根因与 islands bundle 报错原文 | 根 [PROGRESS.md](../PROGRESS.md) 批次记录 |

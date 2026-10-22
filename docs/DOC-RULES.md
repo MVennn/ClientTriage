@@ -14,7 +14,7 @@ docs/ 分四类（索引见 [README.md](README.md)）：
 | 机制与根因 | 为什么会坏、为什么会好 | LNA-FAKE-IP |
 | 排错与维护 | 遇到现象怎么查、日常怎么维持 | TROUBLESHOOTING、PITFALLS、MAINTENANCE、TOOLS |
 | 规范 | 文档怎么写、Release 说明怎么写 | DOC-RULES、VERSIONING、SECRETS、release-notes/ |
-| 参考资料与证据 | 阶段性结论原文、原始审计分片、进度台账 | CHROME-GOOGLE-诊断、VERIFIED-ENV、archive/、evidence/agents/、根 CHANGELOG.md、根 PROGRESS.md |
+| 参考资料与证据 | 阶段性结论原文、原始审计分片、进度台账 | CHROME-GOOGLE-DIAGNOSIS、VERIFIED-ENV、archive/、evidence/agents/、根 CHANGELOG.md、根 PROGRESS.md |
 
 每篇文档开头必须有一个 **「一句话」引言块**（`> **一句话**：…` 或一行定位语），
 让读者不用往下翻就知道这篇管什么。新文档没有它不算写完。
@@ -46,8 +46,8 @@ docs/ 分四类（索引见 [README.md](README.md)）：
 
 ### 禁止重复清单（建仓时定下的反例，勿重蹈）
 
-1. **LNA-FAKE-IP ↔ CHROME-GOOGLE-诊断**：
-   `docs/CHROME-GOOGLE-诊断.md` 写于 2026-10-19，结论是「方案 A/C/D 已落地并端到端验证」；
+1. **LNA-FAKE-IP ↔ CHROME-GOOGLE-DIAGNOSIS**：
+   `docs/CHROME-GOOGLE-DIAGNOSIS.md` 写于 2026-10-19，结论是「方案 A/C/D 已落地并端到端验证」；
    2026-10-20 晚发现**同一 LNA 机制仍导致 Gemini「只剩输入框」**，最终修法是
    `fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`。
    处理方式：LNA-FAKE-IP.md 是**长期正本**，诊断报告降级为**历史证据原文**，
@@ -96,7 +96,7 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
   - 入链：全仓搜旧文件名（Grep），把指向它的链接改成新位置 ——
     **禁止只删文档不改引用方**。
 - 判断某段「重复」是否该收敛时，先看它被谁引用；收敛后引用方必须同步改。
-- 历史记录里的旧文件名（如 CHANGELOG 历史条目、`docs/CHROME-GOOGLE-诊断.md` 里的旧路径）
+- 历史记录里的旧文件名（如 CHANGELOG 历史条目、`docs/CHROME-GOOGLE-DIAGNOSIS.md` 里的旧路径）
   可保留原样 —— 那是当时的事实；但**正文中指向现役文档的链接**必须始终指向现役文档。
 - 指向**其它仓**（路由器系统仓 / 分流规则仓）时写**仓库名**，
   不写物理路径 —— 物理路径会随重组变。
@@ -107,7 +107,8 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
 
 | 变更 | 必须同步 |
 |---|---|
-| 新增 / 删除 / 改名一篇文档 | [README.md](README.md) 索引（见 §7） |
+| 新增 / 删除 / 改名一篇文档 | [README.md](README.md) 索引（见 §9）；改名走 §7 的 `git mv` + 全仓 grep 纪律 |
+| 文档文件名不合 §7（混中文 / 小写 / 下划线） | `git mv` 改名 + 全仓 grep 同步所有引用（见 §7） |
 | LNA 机制、fake-IP 段、解法、判据有变 | [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 正文 + [TROUBLESHOOTING.md](TROUBLESHOOTING.md) 对应现象节 |
 | 新增一个工具脚本 | [TOOLS.md](TOOLS.md)（作用 / 副作用 / 前置条件三列都要补） |
 | 工具的副作用变了（会切 WiFi、会写配置、会起进程） | [TOOLS.md](TOOLS.md) 副作用列 + [PITFALLS.md](PITFALLS.md) + [MAINTENANCE.md](MAINTENANCE.md) 副作用声明段 |
@@ -139,19 +140,39 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
 具体的设备标识（WiFi 名、MAC、IPv6 PD、内网地址、账号）**哪都不写** ——
 按 [SECRETS.md](SECRETS.md) §3.3 脱敏。
 
-## 7. 体量预算与样例时效
+## 7. 文件命名：全大写 + 连字符
+
+`docs/` 下的文件名一律 **`ALL-CAPS-WITH-HYPHENS.md`**（全大写、单词间一个连字符，
+如 `LNA-FAKE-IP.md`、`CHROME-GOOGLE-DIAGNOSIS.md`）。**不混中文、不用小写、不用下划线。**
+
+理由：文件名是**跨文档引用的地址** —— 大小写混写与非 ASCII 字符在不同系统、
+不同 URL 编码下行为不一致，链接一断就是「链接目标不存在」。
+
+改名纪律（改名不是只改文件名）：
+
+1. **用 `git mv`**，保留历史，不要「新建 + 删除」；
+2. **全仓 grep 旧文件名**（含旧名的中文写法），把所有引用改成新名 ——
+   已知引用方通常有：本文档、[README.md](README.md) 索引、根
+   [README.md](../README.md) / [AGENTS.md](../AGENTS.md) /
+   [CHANGELOG.md](../CHANGELOG.md) / [PROGRESS.md](../PROGRESS.md)；
+3. 改完跑 `python tools/check-docs.py` 点验（脚本会拦断链）。
+
+`docs/release-notes/` 下的文件名是**版本号**（`0.1.0.md`），**不带 `v` 前缀** ——
+`v` 只属于发版 tag；写法正本见 [release-notes/README.md](release-notes/README.md)。
+
+## 8. 体量预算与样例时效
 
 - **单篇 ≤ 800 行。** 超了就按「正文档 + 踩坑史」拆：正文档留结论与约束，
   历史 / 根因分析移到踩坑篇或 `archive/`。
   本仓现成的一对：[LNA-FAKE-IP.md](LNA-FAKE-IP.md)（正文档）
-  与 [docs/CHROME-GOOGLE-诊断.md](CHROME-GOOGLE-诊断.md)（阶段性证据原文）。
+  与 [docs/CHROME-GOOGLE-DIAGNOSIS.md](CHROME-GOOGLE-DIAGNOSIS.md)（阶段性证据原文）。
 - **样例时效**：带日期标注的样例（如「2026-10-19 实测」「Chrome 155.0.8059.82 下」）
   可容忍过时 —— 它们是历史记录；但**能力清单类内容**
   （「本仓有哪些工具」「有哪些文档」「覆盖哪些现象」）必须随变更同步，不允许停留在旧状态。
 - **命令原文不因「旧了」而改写**：命令过时就在旁边写「此命令对应当时的版本」，
   不要直接改成看起来更新的样子 —— 那会毁掉证据链。
 
-## 8. 索引维护与孤儿零容忍
+## 9. 索引维护与孤儿零容忍
 
 - [README.md](README.md) 是 docs/ 的唯一索引，**新增 / 删除 / 改名文档必须同步更新**。
 - **孤儿文档零容忍**：任何新文档必须至少被一处既有文档引用（或进索引并有明确入口），

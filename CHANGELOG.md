@@ -1,22 +1,28 @@
 # 更新日志
 
 > **一句话**：本仓的开发者记录 —— 每个版本改了什么、为什么、怎么验；
-> 顶部的版本命名规则是**摘要**，**正本见 [docs/VERSIONING.md](docs/VERSIONING.md) §1–§2**。
+> 版本段标题是**版本号的唯一正本**，进位规则**正本见 [docs/VERSIONING.md](docs/VERSIONING.md)**。
 
-版本号形如 `vX.Y.Z`。**版本命名规则（摘要，正本见 VERSIONING.md）**：
-
-| 这次发布包含…… | 动哪位 | 写法 | 例子 |
-|---|---|---|---|
-| **有功能更新** —— 新增工具 / 新增文档章节 / 现有工具的行为变了 | **次版本 +0.1.0**，补丁归零 | `vX.Y.Z` → `vX.Y+1.0` | `v0.1.0` → `v0.2.0` |
-| **没有功能更新** —— 只修 bug、只补文档、只改措辞 | **补丁版本 +0.0.1** | `vX.Y.Z` → `vX.Y.Z+1` | `v0.1.0` → `v0.1.1` |
-| 重大重构、不兼容变更（工具的入参 / 输出格式变了、目录结构变了） | **主版本 +1.0.0**，后两段归零 | `vX.Y.Z` → `vX+1.0.0` | `v0.9.3` → `v1.0.0` |
-
-判断口诀：**「文件清单里是不是多了一个以前没有的东西？」** 是 → `+0.1.0`；否 → `+0.0.1`。
-只改文档措辞、只补错别字 → 补丁版本。删掉一个工具或一篇文档 → 按「有功能更新」处理。
+版本标题形如 `## [0.1.0] — <日期>`（**版本号本身，不带 `v`**；发版 tag 才带 `v`，如 `v0.1.0`）。
+进位规则一句话：**有功能更新进次版本（+0.1.0），没有就进补丁版本（+0.0.1）** ——
+判据与边界见 [docs/VERSIONING.md](docs/VERSIONING.md)。
 
 ---
 
 ## [未发布] — 2026-10-21 ~ 2026-10-22
+
+### 文档骨架对齐 GSAuxiliary（2026-10-22）
+
+按基准仓 `docs/DOC-RULES.md` / `docs/README.md` / `docs/VERSIONING.md` / `docs/release-notes/README.md` 的口径同步本仓文档骨架。**只改文档，未动代码 / 脚本 / CI 逻辑。**
+
+- 调整 文档 —— `docs/CHROME-GOOGLE-诊断.md` → `docs/CHROME-GOOGLE-DIAGNOSIS.md`（`git mv`）：`docs/` 文件名统一「全大写 + 连字符」；全仓引用（docs/README、docs/DOC-RULES、docs/LNA-FAKE-IP、docs/MAINTENANCE、CHANGELOG、AGENTS）同步
+- 调整 文档 —— `docs/release-notes/v0.1.0.md` → `docs/release-notes/0.1.0.md`（`git mv`）：文件名 = `versionName`，**不带 `v`**；`v` 前缀只属于发版 tag（tag `v0.1.0` 未动）
+- 调整 文档 —— `docs/release-notes/README.md`「文件名 = 版本号」改为「文件名 = `versionName`（不带 `v`）」，并写明 `v` 的归属
+- 调整 文档 —— `docs/README.md` 索引重写：引言块与结尾提醒对齐基准仓措辞（结尾去掉 `§8` 锚点后缀），保留「（正本）」说明，一句话定位压到一行可读，补 `release-notes/` 条目
+- 调整 文档 —— `docs/DOC-RULES.md` 新增 §7「文件命名：全大写 + 连字符」（`git mv` + 全仓 grep 的改名纪律）；原 §7 / §8 顺延为 §8 / §9，变更触发矩阵补「文件名不合规范」一行
+- 调整 文档 —— `docs/VERSIONING.md`：§2 标题改为「怎么判断『有没有功能更新』」并补「打开工具表与索引找答案」的口诀与「改判据 / 删能力 / 改分区」边界行；§5 改为「不发版的时候：不要动版本号」
+- 调整 文档 —— 本篇顶部的进位规则表收敛为一句话 + 指向 `docs/VERSIONING.md` 的链接（单一正本）；版本标题口径改为「版本号不带 `v`」
+- 修复 文档 —— `docs/VERSIONING.md` §6「两处待同步（尚未改动）」改为「口径衔接（已收敛）」
 
 ### 收尾大扫除（2026-10-22）
 
@@ -61,7 +67,7 @@
 （PC 客户端经代理访问境外服务的排障）**独立成一个可单独上传 GitHub 的仓库。
 
 本段只记录**建仓动作**与**建仓时就已经知道的欠账**，不重复既有诊断结论
-（结论见 [docs/CHROME-GOOGLE-诊断.md](docs/CHROME-GOOGLE-诊断.md) 与 `evidence/agents/`）。
+（结论见 [docs/CHROME-GOOGLE-DIAGNOSIS.md](docs/CHROME-GOOGLE-DIAGNOSIS.md) 与 `evidence/agents/`）。
 
 ### 调整
 
@@ -70,7 +76,7 @@
 - 调整 工具 —— `tools/clear-chrome-region.js`（清 Chrome 地区种子）从原 `tools/` 迁入
 - 调整 工具 —— `tools/verify-gemini.sh`（Gemini 复测编排）从原 `tools/` 迁入
 - 调整 工具 —— `tools/cdp.js` 从原 `audit/cdp.js` 迁入 `tools/`，定位从「一次性审计产物」提升为「长期工具」
-- 调整 文档 —— `CHROME-GOOGLE-诊断-20261019.md` 更名 `docs/CHROME-GOOGLE-诊断.md` 并迁入 `docs/`
+- 调整 文档 —— `CHROME-GOOGLE-诊断-20261019.md` 更名 `docs/CHROME-GOOGLE-诊断.md` 并迁入 `docs/`（2026-10-22 起按 [docs/DOC-RULES.md](docs/DOC-RULES.md) §7 的全大写命名再改名 `docs/CHROME-GOOGLE-DIAGNOSIS.md`）
 - 调整 证据 —— 9 份子代理只读审计分片迁入 `evidence/agents/`：`agent-browser-client` / `agent-clean-exit-strategy` / `agent-google-others` / `agent-ip-reputation` / `agent-openai` / `agent-pc-side` / `agent-social-media` / `agent-streaming-dev` / `agent-youtube`
 - 调整 证据 —— `gemini-after.png`、`shot-cf-fresh.png` 迁入 `evidence/`；大截图按 `.gitignore` 排除，只本地留存
 - 调整 进度 —— 建立本仓根 `PROGRESS.md` 作为唯一进度台账（追加式），承接拆分前原根 `PROGRESS.md` 里与客户端排障相关的批次
@@ -83,7 +89,7 @@
 - 调整 文档 —— 新增 `docs/TROUBLESHOOTING.md`：按现象检索的排错手册，每节给可执行命令与「客户端问题还是路由器问题」的判据
 - 调整 文档 —— 新增 `docs/MAINTENANCE.md`：维护流程 —— 地区种子要能重复执行、截图与日志的保留期限、证据文件命名、工具脚本副作用必须在 README 显著位置声明
 - 调整 文档 —— 新增 `docs/release-notes/README.md`：Release 说明格式正本
-- 调整 文档 —— 新增 `docs/release-notes/v0.1.0.md`：首版 Release 说明
+- 调整 文档 —— 新增 `docs/release-notes/0.1.0.md`：首版 Release 说明（建仓时名 `v0.1.0.md`，2026-10-22 按「文件名 = `versionName`、不带 `v`」改名）
 - 调整 文档 —— 新增根 `CHANGELOG.md`（本文件）、`NOTICE`、`.gitignore`
 
 ### 调整（通用化批次）
@@ -149,7 +155,7 @@ Chrome LNA 与 fake-IP 为什么冲突）与**复现环境**（当时那台设�
 - **`tools/clear-chrome-region.js` 的 Chrome profile 路径硬编码** —— 原先写死本机用户的 Chrome 用户数据目录。
   **缺的是**「改成从环境变量 / 参数读取」的改动本身；通用化批次已改为**自动探测**
   （`%LOCALAPPDATA%\Google\Chrome\User Data`），并支持 `CHROME_USER_DATA` 环境变量与首个命令行参数覆盖。
-- **`docs/CHROME-GOOGLE-诊断.md` 的过期声明** —— 该文写于 2026-10-19，结论是「方案 A/C/D 已落地并端到端验证」；
+- **`docs/CHROME-GOOGLE-DIAGNOSIS.md` 的过期声明** —— 该文写于 2026-10-19，结论是「方案 A/C/D 已落地并端到端验证」；
   2026-10-20 晚发现**同一 LNA 机制仍导致 Gemini「只剩输入框」**，最终修法是
   `fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`。
   **缺的是**在那篇文档头部加一行「本文结论已被 `docs/LNA-FAKE-IP.md` 修正」的声明 ——

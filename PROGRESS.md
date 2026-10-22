@@ -209,3 +209,30 @@
 - 临时 Chrome profile / 残留进程：0
 
 ## 状态: 已完成
+
+---
+
+# 2026-10-22 文档骨架对齐 GSAuxiliary
+
+## 目标
+把基准仓 GSAuxiliary 的文档骨架（命名 / 索引 / 版本口径 / release-notes 命名）同步到本仓。
+
+## 已完成变更
+- [x] `git mv docs/CHROME-GOOGLE-诊断.md docs/CHROME-GOOGLE-DIAGNOSIS.md`；全仓引用同步
+      （docs/README、docs/DOC-RULES、docs/LNA-FAKE-IP、docs/MAINTENANCE、CHANGELOG、AGENTS）
+- [x] `git mv docs/release-notes/v0.1.0.md docs/release-notes/0.1.0.md`（文件名 = `versionName`，
+      不带 `v`）；git tag `v0.1.0` 未动；`docs/release-notes/README.md` 的命名口径同步
+- [x] `docs/README.md` 索引重写：引言块 / 结尾提醒对齐基准仓（结尾去掉 `§8` 后缀），
+      保留「（正本）」说明，一句话定位压到一行，补 `release-notes/` 条目
+- [x] `docs/DOC-RULES.md` 新增 §7「文件命名：全大写 + 连字符」（`git mv` + 全仓 grep 纪律）；
+      原 §7 / §8 顺延为 §8 / §9；变更触发矩阵补「文件名不合规范」一行；跨文件 `§7` 引用同步
+- [x] `docs/VERSIONING.md`：§2 补「打开工具表与索引找答案」口诀与边界行，§5 改为「不发版的时候：不要动版本号」；
+      CHANGELOG 顶部的进位规则表收敛为一句话 + 链接；§6 「两处待同步」改为「口径衔接（已收敛）」
+- [x] 全仓 `python tools/check-docs.py` ✓（19 篇：链接 / 锚点 / 引言块 / 孤儿）
+
+## 自检
+- `python tools/check-docs.py` ✓，退出码 0
+- 全仓 grep 旧名 `CHROME-GOOGLE-诊断` / `release-notes/v0.1.0.md`：仅剩 CHANGELOG 历史条目里的旧名记述（当时的事实，保留）
+- 未动代码 / 脚本 / CI 逻辑；未动 `evidence/` / `memories/` / `third-party/`；未 commit / push / 打 tag
+
+## 状态: 已完成
