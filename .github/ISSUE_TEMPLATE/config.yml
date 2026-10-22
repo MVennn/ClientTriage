@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 排错手册
+    url: https://github.com/MVennn/ClientTriage/blob/main/docs/TROUBLESHOOTING.md
+    about: 按现象查，每一节都给了「客户端问题还是路由器问题」的判据。
+  - name: 工具清单
+    url: https://github.com/MVennn/ClientTriage/blob/main/docs/TOOLS.md
+    about: 三个工具的完整用法、副作用与前置条件。

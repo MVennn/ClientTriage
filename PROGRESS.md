@@ -165,3 +165,22 @@
 - 根 README 84 行（要求区间 80–110）；README 里所有仓库内链接目标均存在；未链 `docs/README.md` 索引。
 
 ## 状态: 已完成
+
+---
+
+# 2026-10-22 仓库门面：Issue 表单
+
+## 目标
+对齐 GSAuxiliary 的仓库门面：补上 Issue 表单，让反馈自带定位所需的环境与输出。
+
+## 已完成变更
+- [x] 新增 `.github/ISSUE_TEMPLATE/bug_report.yml` —— 工具选择、完整命令、Windows / Chrome / 代理环境、
+      输出或控制台错误原文；确认已退出自己的 Chrome、本仓只做定位与取证。
+- [x] 新增 `.github/ISSUE_TEMPLATE/feature_request.yml` —— 场景、期望效果、范围确认。
+- [x] 新增 `.github/ISSUE_TEMPLATE/config.yml` —— 关掉空白 Issue，挂排错手册与工具清单。
+
+## 自检
+- `python tools/check-docs.py` ✓，退出码 0。
+- 三份 YAML 均可被 `yaml.safe_load` 解析。
+
+## 状态: 已完成
