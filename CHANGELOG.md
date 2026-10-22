@@ -14,11 +14,20 @@
 判断口诀：**「文件清单里是不是多了一个以前没有的东西？」** 是 → `+0.1.0`；否 → `+0.0.1`。
 只改文档措辞、只补错别字 → 补丁版本。删掉一个工具或一篇文档 → 按「有功能更新」处理。
 
-> 仓库尚无 `docs/VERSIONING.md`；将来建了，把规则搬过去并把本段改成一句指向它的链接。
-
 ---
 
 ## [未发布] — 2026-10-21
+
+### 收尾大扫除（2026-10-22）
+
+- 清理 磁盘 —— 复核 `%TEMP%\verify-prof` / `%TEMP%\verify-shot` 与残留的临时 Chrome 进程：均为 0；
+  仓内无 `__pycache__`、过期日志与多余备份，本轮未删文件（体积 3.2M 不变）
+- 调整 文档 —— `docs/TOOLS.md` 补 `tools/check-docs.py` 与 `tools/make_social_preview.py` 的维护脚本表
+  （作用 / 副作用 / 前置条件）；`docs/README.md` 索引与 `docs/DOC-RULES.md` §1 的脚本清单同步
+- 调整 文档 —— `docs/release-notes/README.md` 补「反馈入口」规则（加粗总结后一行、绝对链接
+  `issues/new/choose`），版本规则正本改指 [docs/VERSIONING.md](docs/VERSIONING.md)
+- 修复 文档 —— 删掉本篇顶部「仓库尚无 `docs/VERSIONING.md`」的过期说明（该文件已存在）
+- 调整 文档 —— `docs/MAINTENANCE.md` §8 追加本轮维护记录
 
 ### Issue 表单（2026-10-22）
 

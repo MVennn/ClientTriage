@@ -184,3 +184,28 @@
 - 三份 YAML 均可被 `yaml.safe_load` 解析。
 
 ## 状态: 已完成
+
+---
+
+# 2026-10-22 收尾大扫除
+
+## 目标
+按系列仓共用作业书做一次只减不加的大扫除：清可再生产物、对齐文档漂移、补记账。
+
+## 已完成变更
+- [x] L1 磁盘垃圾复核：`%TEMP%\verify-prof`、`%TEMP%\verify-shot` 与匹配
+      `verify-prof|verify-shot` 的 Chrome 进程均为 0；仓内无 `__pycache__` / 过期日志 /
+      多余备份，本轮未删文件（3.2M 不变）
+- [x] `docs/TOOLS.md` 补两个维护脚本（`tools/check-docs.py` / `tools/make_social_preview.py`）
+      的作用 / 副作用 / 前置条件
+- [x] `docs/README.md` 索引、`docs/DOC-RULES.md` §1 分类成员与实际文件对齐
+- [x] `docs/release-notes/README.md` 补「反馈入口」规则；版本规则正本改指 `docs/VERSIONING.md`
+- [x] `docs/MAINTENANCE.md` §8 追加本轮维护记录
+- [x] 删掉 CHANGELOG 顶部「仓库尚无 docs/VERSIONING.md」的过期说明
+
+## 自检
+- `python tools/check-docs.py` ✓，退出码 0（19 篇：链接 / 锚点 / 引言块 / 孤儿）
+- `bash -n tools/verify-gemini.sh`、`node --check` 两个工具 JS、两个 Python 脚本 `ast.parse` 均通过
+- 临时 Chrome profile / 残留进程：0
+
+## 状态: 已完成

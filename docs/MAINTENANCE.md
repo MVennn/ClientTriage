@@ -87,7 +87,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 **规则**：任何脚本只要会**改用户机器上的状态**，它的副作用必须登记在
 [TOOLS.md](TOOLS.md) 的工具表**副作用**列，并在 [PITFALLS.md](PITFALLS.md) 有对应坑位。
 
-**当前三个工具的副作用登记**：
+**当前三个使用者工具的副作用登记**：
 
 | 脚本 | 副作用 | 登记位置 |
 |---|---|---|
@@ -151,7 +151,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 - **证据原文**：`evidence/agents/*.md` 的全部内容（含原始输出、报错原文、命令）；
 - **`docs/CHROME-GOOGLE-诊断.md`**：阶段性结论原文，即使结论已过期 —— 过期由索引与
   [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 标注，**不删不改**；
-- **`tools/` 三个脚本的逻辑**：它们是别人正在用的入口，改行为前先改 [TOOLS.md](TOOLS.md) 的副作用列；
+- **`tools/` 三个使用者脚本的逻辑**（`clear-chrome-region.js` / `verify-gemini.sh` / `cdp.js`）：它们是别人正在用的入口，改行为前先改 [TOOLS.md](TOOLS.md) 的副作用列；
 - **你日常 Chrome 的 profile**：只允许清 5 个 `variations_*_country` 键；
 - **任何凭据**：本仓不应出现明文口令、订阅链接、节点 UUID。
 
@@ -162,3 +162,4 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 | 2026-10-19 | Chrome LNA 拦截 fake-IP 的诊断与路由器侧修复（`fake_ip_filter` 加 Google 域、`quicguard.nft`、Play CDN 按 IP 分流） | 扩展安装恢复；**但「已修复」结论不完整** —— 同一机制仍导致 Gemini 只剩输入框 |
 | 2026-10-20 | Google 地区判定全量实测（28 个出口逐个测 cc）；Gemini「只剩输入框」的真根因定位（islands bundle 被 LNA/CORS 拦）；`fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`（共 21 条） | Gemini 恢复（用户确认「gemini 修好了」）；**但判据当时仍有缺陷**（靠「外壳能打开」结案），补在 [LNA-FAKE-IP.md](LNA-FAKE-IP.md) §5 |
 | 2026-10-20 | **本仓建仓**：从原多仓工作区拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitHub、独立看懂 |
+| 2026-10-22 | 收尾大扫除：复核临时 Chrome profile / 残留进程 / `__pycache__` / 过期日志与备份；对齐 `docs/README.md` 索引与 [TOOLS.md](TOOLS.md) 的脚本清单（补两个维护脚本）；Release 说明补「反馈入口」规则 | 临时 profile 与残留进程均为 0，仓库无 L1 垃圾；`python tools/check-docs.py` 退出码 0 |

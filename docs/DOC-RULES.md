@@ -12,9 +12,9 @@ docs/ 分四类（索引见 [README.md](README.md)）：
 | 类别 | 收什么 | 现有成员 |
 |---|---|---|
 | 机制与根因 | 为什么会坏、为什么会好 | LNA-FAKE-IP |
-| 排错与维护 | 遇到现象怎么查、日常怎么维持 | TROUBLESHOOTING、PITFALLS、MAINTENANCE |
-| 规范 | 文档怎么写、Release 说明怎么写 | DOC-RULES、release-notes/ |
-| 参考资料与证据 | 阶段性结论原文、原始审计分片、进度台账 | CHROME-GOOGLE-诊断、archive/、evidence/agents/、根 CHANGELOG.md、根 PROGRESS.md |
+| 排错与维护 | 遇到现象怎么查、日常怎么维持 | TROUBLESHOOTING、PITFALLS、MAINTENANCE、TOOLS |
+| 规范 | 文档怎么写、Release 说明怎么写 | DOC-RULES、VERSIONING、SECRETS、release-notes/ |
+| 参考资料与证据 | 阶段性结论原文、原始审计分片、进度台账 | CHROME-GOOGLE-诊断、VERIFIED-ENV、archive/、evidence/agents/、根 CHANGELOG.md、根 PROGRESS.md |
 
 每篇文档开头必须有一个 **「一句话」引言块**（`> **一句话**：…` 或一行定位语），
 让读者不用往下翻就知道这篇管什么。新文档没有它不算写完。
