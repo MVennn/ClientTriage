@@ -236,3 +236,35 @@
 - 未动代码 / 脚本 / CI 逻辑；未动 `evidence/` / `memories/` / `third-party/`；未 commit / push / 打 tag
 
 ## 状态: 已完成
+
+# 2026-10-23 第 N+1 轮：收尾大扫除（证据与文档对账）
+
+## 任务目标
+按 `docs/MAINTENANCE.md` §1 的触发语做一次「大扫除」：§3 证据整理 → §4 副作用复核 →
+§5 文档对账 → §6 收尾清单。本仓没有编译产物、没有依赖锁、没有测试套件，
+重心在证据与文档，不在代码。
+
+## 已完成变更
+- [x] §3 证据整理 —— 核对保留期限：`evidence/*.log` 实际 0 份（无超 7 天项）；
+      `evidence/agents/` 9 份分片按「永久」保留；`evidence/*.png` 两张截图本地留存、
+      不入版本库；Chrome 配置备份 `.bak-region-*` 仓内 0 份、真实 profile 下 1 份
+      （未超「保留最近 3 份」）
+- [x] §4 副作用复核 —— `docs/TOOLS.md` 工具表与 `tools/` 三个使用者脚本一致，无新增副作用
+- [x] §5 文档对账 11 条 —— 逐条过；发现并补记 4 条漏登记的改动（见下）
+- [x] §6 收尾清单 —— 临时 Chrome profile `%TEMP%/verify-prof` 与 `verify-shot` 均不存在；
+      残留 chrome 进程 7 个全部是日常 profile，无一命中 `verify-prof|verify-shot`
+- [x] 清 `tools/__pycache__`（20K，可再生产物）
+- [x] `CHANGELOG.md` 补「文档正本与守卫规则（2026-10-24）」段
+
+## 验收
+- `python tools/check-docs.py` ✓（20 篇：链接 / 锚点 / 引言块 / 孤儿）
+- `python tools/check-secrets.py` ✓（59 个文件，未发现疑似敏感信息）
+- 红线未动：`evidence/agents/*.md` 原文、`docs/CHROME-GOOGLE-DIAGNOSIS.md`、
+  三个使用者脚本、日常 Chrome profile
+
+## 待解决 / 注意事项
+- 对账发现的共性：本轮四个仓（本仓 / AX / SC / Ops）都漏记了
+  「`docs/DOC-RULES.md` 新增『修缺陷必须补正本』」这一条 ——
+  确立规则的提交自己没留痕。已按各仓格式补进「未发布」段。
+
+## 状态: 已完成
