@@ -107,6 +107,7 @@ WiFi 名、本机绝对路径、账号标识）**可以换值** —— 用占位
 
 | 变更 | 必须同步 |
 |---|---|
+| **修一个缺陷**（行为变化 / 判据修正 / 安全加固） | 对应正本补一条 **现象 → 根因 → 怎么避**：[PITFALLS.md](PITFALLS.md)；CHANGELOG 只是变更记录，**不算补文档** |
 | 新增 / 删除 / 改名一篇文档 | [README.md](README.md) 索引（见 §9）；改名走 §7 的 `git mv` + 全仓 grep 纪律 |
 | 文档文件名不合 §7（混中文 / 小写 / 下划线） | `git mv` 改名 + 全仓 grep 同步所有引用（见 §7） |
 | LNA 机制、fake-IP 段、解法、判据有变 | [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 正文 + [TROUBLESHOOTING.md](TROUBLESHOOTING.md) 对应现象节 |
