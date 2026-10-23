@@ -32,9 +32,18 @@ CHROME="${CHROME:-}"
 
 # 临时 profile 目录：放系统临时目录下，跑完即删。
 # TMPDIR/TEMP 可能是 POSIX 路径（Git Bash 的 /tmp）或 Windows 路径，先归一到 POSIX。
+# 带 PID：两个并发复测会话不会互相 rm -rf 对方的 profile。
 TMP_BASE="$(to_posix "${TMPDIR:-${TEMP:-/tmp}}")"
-TMPPROF="$TMP_BASE/verify-prof"
-TMP_SHOT="$TMP_BASE/verify-shot"
+TMPPROF="$TMP_BASE/verify-prof-$$"
+TMP_SHOT="$TMP_BASE/verify-shot-$$"
+
+die() {
+  echo "!! $*" >&2
+  echo "   临时 profile 保留在：$TMPPROF" >&2
+  echo "   临时截图目录保留在：$TMP_SHOT" >&2
+  netsh wlan connect name="$SSID_HOTSPOT" >/dev/null 2>&1 || true
+  exit 1
+}
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # 兄弟仓（路由器系统仓）目录名：默认与本仓同级摆放，可用 SIBLING_REPO 覆盖
@@ -85,7 +94,6 @@ fi
 CHROME_POSIX="$(to_posix "$CHROME_WIN")"
 TMPPROF_WIN="$(to_win "$TMPPROF")"
 TMP_SHOT_WIN="$(to_win "$TMP_SHOT")"
-SHOT_WIN="$(to_win "$HERE/../evidence/gemini-after.png")"
 
 if [ "$SSID_ROUTER" = "YOUR_ROUTER_SSID" ] || [ "$SSID_HOTSPOT" = "YOUR_HOTSPOT_SSID" ]; then
   echo "!! 请先设置 SSID_ROUTER / SSID_HOTSPOT（本仓不写真实 WiFi 名）。" >&2
@@ -109,29 +117,39 @@ fi
 echo "    路由器可达"
 
 echo "=== [2/5] 路由器侧检查 + 修补 ==="
+[ -f "$VERIFY_FIX" ] || die "路由器侧检查脚本不存在：$VERIFY_FIX（用 VERIFY_FIX 指定）"
 /usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=12 \
-      root@"$ROUTER_IP" "sh -s" < "$VERIFY_FIX"
+      root@"$ROUTER_IP" "sh -s" < "$VERIFY_FIX" || die "路由器侧检查失败（ssh 退出码 $?）"
 
 echo "=== [3/5] 启动临时 Chrome（带调试端口，全新 profile）==="
 rm -rf "$TMPPROF"; mkdir -p "$TMPPROF"
 sleep 1
 powershell -NoProfile -Command "Start-Process '$CHROME_WIN' -ArgumentList '--remote-debugging-port=$CDP_PORT','--user-data-dir=$TMPPROF_WIN','--no-first-run','--no-default-browser-check','--window-size=1280,800','https://gemini.google.com/app'" 2>/dev/null
+CDP_READY=0
 for i in $(seq 1 20); do
   sleep 2
-  curl -s -m 3 "http://127.0.0.1:$CDP_PORT/json/version" >/dev/null 2>&1 && break
+  if curl -s -m 3 "http://127.0.0.1:$CDP_PORT/json/version" >/dev/null 2>&1; then CDP_READY=1; break; fi
 done
+[ "$CDP_READY" = "1" ] || die "CDP 端口 $CDP_PORT 在 40 秒内没有就绪（Chrome 可能没起来）"
 echo "    CDP 端口就绪"
 
 echo "=== [4/5] 抓控制台/网络（判断 islands bundle 是否还被拦）==="
 CDP_PORT="$CDP_PORT" node "$HERE/cdp.js" 2>&1 | head -60
 echo "=== [4b] 截图 ==="
 sleep 2
-SHOT="$HERE/../evidence/gemini-after.png"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+SHOT="$HERE/../evidence/gemini-after-$STAMP.png"
+SHOT_LATEST="$HERE/../evidence/gemini-after.png"
+SHOT_WIN="$(to_win "$SHOT")"
 "$CHROME_POSIX" --headless=new --disable-gpu --no-first-run --no-default-browser-check \
   --user-data-dir="$TMP_SHOT_WIN" \
   --window-size=1280,800 --screenshot="$SHOT_WIN" \
   "https://gemini.google.com/app" >/dev/null 2>&1
-ls -la "$SHOT" 2>/dev/null | awk '{print "    截图字节:", $5}'
+SHOT_BYTES=0
+[ -f "$SHOT" ] && SHOT_BYTES="$(wc -c < "$SHOT" 2>/dev/null | tr -d ' ')"
+[ "${SHOT_BYTES:-0}" -gt 0 ] || die "截图没有生成或为 0 字节：$SHOT"
+echo "    截图字节: $SHOT_BYTES -> $SHOT"
+cp -f "$SHOT" "$SHOT_LATEST" 2>/dev/null || true
 
 echo "=== [5/5] 清理临时 Chrome 并切回热点 ==="
 powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { \$_.CommandLine -match 'verify-prof|verify-shot' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }" 2>/dev/null
