@@ -9,7 +9,25 @@
 
 ---
 
-## [未发布] — 2026-10-24
+## [0.2.1] — 2026-10-26
+
+### 全仓审查修复（2026-10-26）
+
+- 修复 `tools/verify-gemini.sh` —— `die` 只切回热点、不杀已启动的临时 Chrome，
+  残留实例继续占着 CDP 端口；下次复测的 `/json/version` 打在旧实例上直接「就绪」，
+  抓到的全是过期状态。`die` 现在按 `verify-prof|verify-shot` 清理临时实例，
+  启动前也先清残留并检查端口占用；超时提示从「40 秒」改为实际约 100 秒（PITFALLS 17）
+- 修复 `tools/cdp.js` —— `send()` 没有超时、也不监听 `close`，调试口断开后脚本永久挂起；
+  每条请求加 20 秒超时，`close`/`error` 时 reject 所有挂起请求；启动时检测
+  Node 22+ 的全局 `WebSocket`（PITFALLS 18）
+- 修复 `tools/check-secrets.py` —— `git ls-files` 失败时按 0 文件「通过」；
+  改为报错退出
+- 修复 `tools/clear-chrome-region.js` —— 非 Windows 上 `tasklist` 的 ENOENT 变成
+  未捕获异常；改为提示「仅支持 Windows」退出。写入前再查一次 Chrome，
+  缩小「检查后用户又启动 Chrome」的窗口
+- 文档 —— README 运行时要求从 Node 18+ 改为 22+（全局 `WebSocket` 的实际要求）
+- 验证 —— `node --check` ✓、`python -m py_compile` ✓、`sh -n` ✓；
+  未做真机复测（需要 Chrome + 路由器 WiFi）
 
 ### 文档正本与守卫规则（2026-10-24）
 
@@ -32,6 +50,8 @@
 - 验证 —— `bash -n` ✓；未设置 SSID 时占位符守卫 exit 2 且不碰网络
 
 ## [0.2.0] — 2026-10-23
+
+面向用户的说明见 [docs/release-notes/0.2.0.md](docs/release-notes/0.2.0.md)。
 
 ### 工具前置检查（2026-10-23）
 

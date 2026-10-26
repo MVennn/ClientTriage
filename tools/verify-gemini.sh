@@ -37,10 +37,16 @@ TMP_BASE="$(to_posix "${TMPDIR:-${TEMP:-/tmp}}")"
 TMPPROF="$TMP_BASE/verify-prof-$$"
 TMP_SHOT="$TMP_BASE/verify-shot-$$"
 
+kill_temp_chrome() {
+  powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { \$_.CommandLine -match 'verify-prof|verify-shot' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }" 2>/dev/null
+}
+
 die() {
   echo "!! $*" >&2
   echo "   临时 profile 保留在：$TMPPROF" >&2
   echo "   临时截图目录保留在：$TMP_SHOT" >&2
+  # 残留的临时 Chrome 会占着 CDP 端口，让下一次复测连到旧实例。
+  kill_temp_chrome
   netsh wlan connect name="$SSID_HOTSPOT" >/dev/null 2>&1 || true
   exit 1
 }
@@ -122,6 +128,13 @@ echo "=== [2/5] 路由器侧检查 + 修补 ==="
       root@"$ROUTER_IP" "sh -s" < "$VERIFY_FIX" || die "路由器侧检查失败（ssh 退出码 $?）"
 
 echo "=== [3/5] 启动临时 Chrome（带调试端口，全新 profile）==="
+# 先清掉上一次残留的临时实例，再确认端口没有被别的 Chrome 占着：
+# 否则下面的就绪检查会打在旧实例上，抓到的全是过期状态。
+kill_temp_chrome
+sleep 2
+if curl -s -m 3 "http://127.0.0.1:$CDP_PORT/json/version" >/dev/null 2>&1; then
+  die "CDP 端口 $CDP_PORT 已被其他 Chrome 占用（不是本脚本的临时实例）；请关闭它或换 CDP_PORT"
+fi
 rm -rf "$TMPPROF"; mkdir -p "$TMPPROF"
 sleep 1
 powershell -NoProfile -Command "Start-Process '$CHROME_WIN' -ArgumentList '--remote-debugging-port=$CDP_PORT','--user-data-dir=$TMPPROF_WIN','--no-first-run','--no-default-browser-check','--window-size=1280,800','https://gemini.google.com/app'" 2>/dev/null
@@ -130,7 +143,7 @@ for i in $(seq 1 20); do
   sleep 2
   if curl -s -m 3 "http://127.0.0.1:$CDP_PORT/json/version" >/dev/null 2>&1; then CDP_READY=1; break; fi
 done
-[ "$CDP_READY" = "1" ] || die "CDP 端口 $CDP_PORT 在 40 秒内没有就绪（Chrome 可能没起来）"
+[ "$CDP_READY" = "1" ] || die "CDP 端口 $CDP_PORT 约 100 秒内没有就绪（Chrome 可能没起来）"
 echo "    CDP 端口就绪"
 
 echo "=== [4/5] 抓控制台/网络（判断 islands bundle 是否还被拦）==="
@@ -152,7 +165,7 @@ echo "    截图字节: $SHOT_BYTES -> $SHOT"
 cp -f "$SHOT" "$SHOT_LATEST" 2>/dev/null || true
 
 echo "=== [5/5] 清理临时 Chrome 并切回热点 ==="
-powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { \$_.CommandLine -match 'verify-prof|verify-shot' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }" 2>/dev/null
+kill_temp_chrome
 rm -rf "$TMPPROF" "$TMP_SHOT" 2>/dev/null
 netsh wlan connect name="$SSID_HOTSPOT" 2>&1 | tr -d '\r'
 echo "=== 结束（你自己的 Chrome 没有被动过）==="

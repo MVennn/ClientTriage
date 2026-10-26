@@ -2,6 +2,11 @@
 const CDP = "http://127.0.0.1:" + (process.env.CDP_PORT || "9222");
 const URL_TARGET = process.env.CDP_URL || "https://gemini.google.com/app";
 
+if (typeof WebSocket === "undefined") {
+  console.log("ERR Node 22+ is required (global WebSocket is missing)");
+  process.exit(2);
+}
+
 async function main() {
   let targets = [];
   for (let i = 0; i < 40; i++) {
@@ -25,20 +30,43 @@ async function main() {
   ws.addEventListener("message", (e) => {
     const m = JSON.parse(e.data);
     if (m.id && pending.has(m.id)) {
-      pending.get(m.id)(m);
+      const p = pending.get(m.id);
       pending.delete(m.id);
+      clearTimeout(p.timer);
+      p.res(m);
     } else if (m.method) ev.push(m);
   });
   await new Promise((res, rej) => {
     ws.addEventListener("open", res);
     ws.addEventListener("error", rej);
   });
+  // 每条请求都带超时；连接断开时把所有挂起的请求 reject，
+  // 否则脚本会在调试口消失后永久挂起。
   const send = (method, params = {}) =>
-    new Promise((res) => {
+    new Promise((res, rej) => {
       const i = ++id;
-      pending.set(i, res);
-      ws.send(JSON.stringify({ id: i, method, params }));
+      const timer = setTimeout(() => {
+        pending.delete(i);
+        rej(new Error(`CDP timeout: ${method}`));
+      }, 20000);
+      pending.set(i, { res, rej, timer });
+      try {
+        ws.send(JSON.stringify({ id: i, method, params }));
+      } catch (e) {
+        clearTimeout(timer);
+        pending.delete(i);
+        rej(e);
+      }
     });
+  const failAll = (why) => {
+    for (const [, p] of pending) {
+      clearTimeout(p.timer);
+      p.rej(new Error(why));
+    }
+    pending.clear();
+  };
+  ws.addEventListener("close", () => failAll("CDP websocket closed"));
+  ws.addEventListener("error", () => failAll("CDP websocket error"));
 
   await send("Log.enable");
   await send("Runtime.enable");

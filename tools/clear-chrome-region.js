@@ -21,6 +21,10 @@ function chromeRunning() {
     return /"chrome\.exe"/i.test(out);
   } catch (e) {
     if (e.status === 1) return false;
+    if (e.status == null && (e.code === "ENOENT" || e.code === "EACCES")) {
+      console.error("本工具仅支持 Windows（tasklist 不可用）。");
+      process.exit(2);
+    }
     throw e;
   }
 }
@@ -91,6 +95,13 @@ for (const f of files) {
       }
     }
     if (Object.keys(j.variations).length === 0) delete j.variations;
+  }
+  // 写入前再查一次：从上面的检查到这里，用户可能又启动了 Chrome，
+  // 那样这次写入会被 Chrome 退出时整体覆盖。
+  if (chromeRunning()) {
+    console.error("检测到 Chrome 又开始运行，停止写入:", f);
+    console.error("已处理的文件保持已写入状态，请退出 Chrome 后重跑。");
+    process.exit(1);
   }
   fs.writeFileSync(f, JSON.stringify(j));
   console.log((removed.length ? "已清除: " + removed.join(", ") : "（本来就没有地区键）"), "->", f);
