@@ -9,6 +9,24 @@
 
 ---
 
+## [未发布] — 2026-11-01
+
+### 收尾大扫除（2026-11-01）
+
+按 [docs/MAINTENANCE.md](docs/MAINTENANCE.md) §1 的触发语做一次「大扫除」：§3 证据整理 → §4 副作用复核 → §5 文档对账 → §6 收尾清单。只改文档与清可再生产物，未动代码 / CI 逻辑，未动版本号。
+
+- 清理 磁盘 —— 删掉 `tools/__pycache__/`（8.3 KB，`check-secrets.py` 的可再生产物字节码缓存）；
+  复核 `%TEMP%/verify-prof` / `%TEMP%/verify-shot` 与匹配 `verify-prof|verify-shot` 的
+  Chrome 进程均为 0；`evidence/*.log` 0 份（无超 7 天项）；Chrome 配置备份 `.bak-region-*`
+  真实 profile 下 1 份（`Local State` + `Preferences`，未超「保留最近 3 份」）—— 均无可清项
+- 修复 文档 —— `docs/TOOLS.md` 补第 10-24 批漏登记的维护脚本 `tools/check-secrets.py`
+  （作用 / 副作用 / 前置条件）；`docs/README.md` 索引「两个维护脚本」口径同步为三个
+  （文档自检 / 敏感信息守卫 / 门面图）
+- 调整 文档 —— `docs/MAINTENANCE.md` §8 追加本轮维护记录；根 [PROGRESS.md](PROGRESS.md) 追加本轮批次
+- 验证 —— `python tools/check-docs.py` ✓（21 篇）、`python tools/check-secrets.py` ✓（60 个文件）；
+  红线未动：`evidence/agents/*.md` 原文、`docs/CHROME-GOOGLE-DIAGNOSIS.md`、
+  三个使用者脚本、日常 Chrome profile
+
 ## [0.2.1] — 2026-10-26
 
 ### 全仓审查修复（2026-10-26）

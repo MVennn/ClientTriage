@@ -21,7 +21,7 @@
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | 排错手册（**正本**）：按现象检索，「现象 → 排查步骤 → 原因/解法」，附客户端 / 路由器的分诊判据 |
 | [PITFALLS.md](PITFALLS.md) | 踩坑总汇（**正本**）：每条写清「为什么错」与「下次怎么避」，多是测量方法本身的坑 |
 | [MAINTENANCE.md](MAINTENANCE.md) | 维护流程（**正本**）：种子要能重复执行、证据命名与保留期限、工具副作用的登记义务 |
-| [TOOLS.md](TOOLS.md) | 工具清单（**正本**）：三个使用者工具的作用 / 副作用 / 前置条件，另附两个维护脚本 |
+| [TOOLS.md](TOOLS.md) | 工具清单（**正本**）：三个使用者工具的作用 / 副作用 / 前置条件，另附三个维护脚本 |
 
 ## 三、规范
 
@@ -41,7 +41,7 @@
 | [release-notes/](release-notes/README.md) | 面向使用者的 Release 说明，一版一份，文件名 = `versionName`（不带 `v`） |
 | [archive/](archive/) | 一次性归档目录（**当前为空**）：阶段性结论的原文留档处，不进索引条目 |
 | `../evidence/agents/` | 9 份子代理只读审计分片：浏览器层、干净出口、IP 声誉、Google 其余服务、OpenAI、流媒体、社交媒体、YouTube、PC 侧 —— 原始证据逐字保留 |
-| `../tools/` | 三个使用者工具（清地区种子 / Gemini 复测 / CDP 抓控制台）+ 两个维护脚本（文档自检 / 门面图）；用法见 [TOOLS.md](TOOLS.md) |
+| `../tools/` | 三个使用者工具（清地区种子 / Gemini 复测 / CDP 抓控制台）+ 三个维护脚本（文档自检 / 敏感信息守卫 / 门面图）；用法见 [TOOLS.md](TOOLS.md) |
 | 仓库根 [CHANGELOG.md](../CHANGELOG.md) | 开发者记录：建仓动作、结论修正、待补欠账（**版本号本身**在这里维护，规则见 [VERSIONING.md](VERSIONING.md)） |
 | 仓库根 [PROGRESS.md](../PROGRESS.md) | 本仓唯一进度台账（追加式批次日志）：目标 / 步骤勾选 / 状态 / 待解决 |
 | 仓库根 [LICENSE](../LICENSE) | 许可证全文（**MIT**）—— 与根 [NOTICE](../NOTICE) 的第三方声明配套（本仓**不含**任何 GPL-3.0 派生件） |

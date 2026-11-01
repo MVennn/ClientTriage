@@ -163,3 +163,4 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 | 2026-10-20 | Google 地区判定全量实测（28 个出口逐个测 cc）；Gemini「只剩输入框」的真根因定位（islands bundle 被 LNA/CORS 拦）；`fake_ip_filter` 补 `+.gstatic.com` / `+.googleapis.com`（共 21 条） | Gemini 恢复（用户确认「gemini 修好了」）；**但判据当时仍有缺陷**（靠「外壳能打开」结案），补在 [LNA-FAKE-IP.md](LNA-FAKE-IP.md) §5 |
 | 2026-10-20 | **本仓建仓**：从原多仓工作区拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitHub、独立看懂 |
 | 2026-10-22 | 收尾大扫除：复核临时 Chrome profile / 残留进程 / `__pycache__` / 过期日志与备份；对齐 `docs/README.md` 索引与 [TOOLS.md](TOOLS.md) 的脚本清单（补两个维护脚本）；Release 说明补「反馈入口」规则 | 临时 profile 与残留进程均为 0，仓库无 L1 垃圾；`python tools/check-docs.py` 退出码 0 |
+| 2026-11-01 | 收尾大扫除：清 `tools/__pycache__`；复核临时 Chrome profile / 残留进程 / 过期日志 / 多余备份（均无可清项）；对齐 [TOOLS.md](TOOLS.md) 与 `docs/README.md` 索引的脚本清单（补 10-24 批漏登记的 `check-secrets.py`） | 临时 profile 与残留进程均为 0，仓库无 L1 垃圾；`python tools/check-docs.py` 退出码 0（21 篇） |

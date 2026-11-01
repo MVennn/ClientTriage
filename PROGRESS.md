@@ -268,3 +268,36 @@
   确立规则的提交自己没留痕。已按各仓格式补进「未发布」段。
 
 ## 状态: 已完成
+
+# 2026-11-01 收尾大扫除（证据与文档对账）
+
+## 任务目标
+按 `docs/MAINTENANCE.md` §1 的触发语做一次「大扫除」：§3 证据整理 → §4 副作用复核 →
+§5 文档对账 → §6 收尾清单。本仓没有编译产物、没有依赖锁、没有测试套件，
+重心在证据与文档，不在代码。
+
+## 已完成变更
+- [x] §3 证据整理 —— `evidence/agents/` 9 份分片按「永久」红线保留未动；
+      `evidence/*.png` 两张本地留存、不入版本库（`.gitignore` 已排除）；
+      `evidence/*.log` 0 份（无超 7 天项）；Chrome 配置备份 `.bak-region-*`
+      真实 profile 下 1 份（`Local State` + `Preferences`，未超「保留最近 3 份」）；
+      临时 Chrome profile `%TEMP%/verify-prof` 与 `verify-shot` 均不存在，
+      匹配 `verify-prof|verify-shot` 的 chrome 进程 0 个
+- [x] §4 副作用复核 —— 三个使用者工具副作用未变，`docs/TOOLS.md` 登记一致；
+      `tools/check-secrets.py` 只读、无副作用
+- [x] §5 文档对账 —— 逐条过；唯一漂移：`tools/check-secrets.py`（10-24 批新增）漏登记在
+      `docs/TOOLS.md` 维护脚本表与 `docs/README.md` 索引（写的是「两个维护脚本」），已补齐
+- [x] §6 收尾清单 —— 清 `tools/__pycache__/`（8.3 KB，可再生产物）
+- [x] `CHANGELOG.md` 开「[未发布]」段记录本轮；`docs/MAINTENANCE.md` §8 追加本轮维护记录
+
+## 自检
+- `python tools/check-docs.py` ✓（21 篇：链接 / 锚点 / 引言块 / 孤儿）
+- `python tools/check-secrets.py` ✓（60 个文件，未发现疑似敏感信息）
+- `git status --porcelain` 仅剩本轮预期改动
+
+## 待解决 / 注意事项
+- 无新增欠账。一处口径差异备查：`docs/MAINTENANCE.md` §3.1 要求分片开头写
+  「状态 / 范围」两行，现有 9 份分片里 8 份以「结论：」开头（`agent-pc-side.md` 除外）——
+  红线不许改写分片原文，保持原样，仅在此登记。
+
+## 状态: 已完成
