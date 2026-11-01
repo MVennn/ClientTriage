@@ -13,7 +13,7 @@
 | 脚本 | 作用 | 副作用 | 前置条件 |
 |---|---|---|---|
 | `tools/check-docs.py` | 文档自检：相对链接 / 锚点 / 孤儿文档 / 「一句话」引言块（[DOC-RULES.md](DOC-RULES.md) 规则的可执行版本） | 无（只读） | Python 3 |
-| `tools/check-secrets.py` | 敏感信息守卫：扫描已跟踪文件（`--all` 连工作树里的未跟踪文件一起扫，遵循 `.gitignore`）里的可用凭据 / 本机用户目录 / 真实邮箱；规则正本是 [SECRETS.md](SECRETS.md)「推送前脱敏规则」 | 无（只读；不写任何文件） | Python 3；已接入 [CI](../.github/workflows/ci.yml)「敏感信息扫描」步骤 |
+| `tools/check-secrets.py` | 敏感信息守卫：扫描已跟踪文件（`--all` 连工作树里的未跟踪文件一起扫，忽略规则由 git 判定，遵循 `.gitignore`）里的可用凭据 / 本机用户目录 / 真实邮箱；规则正本是 [SECRETS.md](SECRETS.md)「推送前脱敏规则」 | 无（只读；不写任何文件） | Python 3；`--all` 模式需 git；已接入 [CI](../.github/workflows/ci.yml)「敏感信息扫描」步骤 |
 | `tools/make_social_preview.py` | 从 `assets/icon.svg` 渲染 `assets/logo.png`（512×512）与 `assets/social-preview.png`（1280×640）；`--ico` 另写 `assets/icon.ico`，`--preview-only` 只写社交预览 | **覆盖写入**上面两个（或三个）`assets/` 文件 | Python 3 + `numpy` + `Pillow` |
 
 环境变量清单（含脱敏口径）见 [SECRETS.md](SECRETS.md) §3.5；

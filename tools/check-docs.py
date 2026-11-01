@@ -49,16 +49,27 @@ def collect(dirs):
                 if not f.endswith(".md"):
                     continue
                 norm = os.path.normpath(os.path.join(dp, f))
-                rel = os.path.relpath(norm, ROOT).replace(os.sep, "/")
+                rel = rel_to_root(norm)
                 if any(rel.startswith(fd) or fd in rel for fd in FROZEN_DIRS):
                     continue
                 mds.append(norm)
     return sorted(set(mds))
 
 
-def anchors_of(path: str) -> set[str]:
+def rel_to_root(p: str) -> str:
+    # 跨盘符（Windows，如仓在 F: 被检目录在 C:）时 relpath 抛 ValueError，
+    # 整个脚本会带 traceback 崩掉 —— 用绝对路径顶上，至少能干净报错。
     try:
-        s = open(path, encoding="utf-8", errors="replace").read()
+        return os.path.relpath(p, ROOT).replace(os.sep, "/")
+    except ValueError:
+        return p.replace(os.sep, "/")
+
+
+def anchors_of(path: str) -> set[str]:
+    # utf-8-sig：文件带 BOM 时把首行 BOM 剥掉，否则 `^#{1,6}` 匹配不到第一个标题，
+    # 指向首节锚点的链接会误报「锚点不存在」。
+    try:
+        s = open(path, encoding="utf-8-sig", errors="replace").read()
     except OSError:
         return set()
     a = set(re.findall(r'<a\s+id="([^"]+)"', s))
@@ -78,10 +89,10 @@ def main() -> int:
 
     for m in mds:
         try:
-            s = open(m, encoding="utf-8", errors="replace").read()
+            s = open(m, encoding="utf-8-sig", errors="replace").read()
         except OSError:
             continue
-        rel = os.path.relpath(m, ROOT).replace(os.sep, "/")
+        rel = rel_to_root(m)
         for link in LINK.findall(s):
             if link.startswith(("http://", "https://", "mailto:")):
                 continue
@@ -103,8 +114,13 @@ def main() -> int:
                     for f2 in fn2:
                         if f2.endswith(".md"):
                             linked.add(os.path.abspath(os.path.join(dp2, f2)))
-            if frag and target.endswith(".md") and frag not in anchor_map.get(target, set()):
-                problems.append(f"{rel}: 目标锚点不存在 → {link}")
+            if frag and target.endswith(".md"):
+                # 冻结目录（docs/archive/ 等）里的文档没进 anchor_map —— 按需补算锚点，
+                # 否则链进归档文档的任何 #锚点 都会被误报「目标锚点不存在」。
+                if target not in anchor_map:
+                    anchor_map[target] = anchors_of(target)
+                if frag not in anchor_map[target]:
+                    problems.append(f"{rel}: 目标锚点不存在 → {link}")
         # 根 README 是面向用户的门面（对齐系列仓 gsauxiliary 的格式），不套文档引言块规则
         if (not HAS_ONE_LINER.search(s)
                 and rel != "README.md"
@@ -113,7 +129,7 @@ def main() -> int:
             problems.append(f"{rel}: 开头缺少「一句话」引言块")
 
     for m in mds:
-        rel = os.path.relpath(m, ROOT).replace(os.sep, "/")
+        rel = rel_to_root(m)
         if rel.startswith("docs/") and os.path.abspath(m) not in linked and rel != "docs/README.md":
             problems.append(f"{rel}: 孤儿文档 —— 没有被任何文档引用（也未进 docs/README.md 索引）")
 

@@ -301,3 +301,41 @@
   红线不许改写分片原文，保持原样，仅在此登记。
 
 ## 状态: 已完成
+
+# 2026-11-01 脚本细节兜底审查（守卫边界 + 红线核对）
+
+## 任务目标
+对 10-26 全量审查从未深审的脚本细节做兜底：两个 Python 守卫的边界（空文件 / CRLF / BOM /
+嵌套目录 / 退出码语义 / 误报漏报）、`clear-chrome-region.js` 清除集合与红线严格比对、
+CI 与本机自检口径核对、10-26 后提交快速过 diff。
+
+## 已完成变更
+- [x] `tools/check-docs.py` —— BOM 首标题锚点丢失（改 `utf-8-sig`）、冻结目录文档锚点误报
+      （按需补算锚点）、跨盘符 `os.path.relpath` ValueError 崩溃（回退绝对路径），均修复
+- [x] `tools/check-secrets.py` —— 「本机用户目录」整行放行改逐命中段（`finditer`）；
+      截断/占位豁免落实「只对文档类文件」（SECRETS.md §3.2 正本）；占位用户名补反斜杠形式；
+      `--all` 改 `git ls-files --others --exclude-standard`（对齐 TOOLS.md「遵循 .gitignore」口径）；
+      退出码 2 补进 docstring；旧正则里 0x08 字节（本意 `\b`）随重写移除
+- [x] `clear-chrome-region.js` 核对通过、未改（红线脚本）—— 清除集合 = 5 个 `variations_*_country`
+      键 ×（顶层 + `variations.` 嵌套）与 MAINTENANCE §7 红线严格一致；其余键原样、备份 = 改前原文、
+      幂等、坏 JSON 不动、空格路径正常 —— 全部在临时假 profile 验证
+- [x] `.github/workflows/ci.yml` 与本机自检口径一致；本轮补跑 `node --check`（全部 .js）+ `sh -n`
+      （全部 .sh）通过
+- [x] 10-26 后提交快核：1e60ecf（SECRETS 示例占位化）、fbf1c2d（大扫除+登记）均纯文档，无代码改动
+- [x] 文档补正本：`docs/SECRETS.md` §3.1「整行跳过」→「命中段放行」；`docs/TOOLS.md` 补 `--all` 需 git；
+      `CHANGELOG.md` [未发布] 段记本轮
+
+## 验收
+- `python tools/check-docs.py` ✓（21 篇：链接 / 锚点 / 引言块 / 孤儿）
+- `python tools/check-secrets.py` ✓（60 个文件）；`--all` ✓（60 个，当前无非忽略未跟踪文件）
+- 守卫行为矩阵在临时 git 仓实测通过（混行只报真值 / 双真值报两处 / 文档类豁免 / 非文档不豁免 /
+  .gitignore 生效 / BOM / CRLF / 空文件 / 跨盘符）
+- 红线未动：`evidence/agents/*.md` 原文（守卫只读不改）、`docs/CHROME-GOOGLE-DIAGNOSIS.md`、
+  三个使用者脚本、日常 Chrome profile（一切验证用临时假目录，未启动 Chrome）
+
+## 待解决 / 注意事项
+- 登记不修（红线脚本 + 无正确性问题）：`clear-chrome-region.js` 坏 JSON 时也会先建 `.bak`；
+  无键可清时也会重写文件（parse→stringify 往返等价）。多余备份由 MAINTENANCE §6 周期复核兜底
+- `check-docs.py` 显式传入非 .md 文件会按文档规则报「缺一句话」—— 语义歧义，登记不改
+
+## 状态: 已完成

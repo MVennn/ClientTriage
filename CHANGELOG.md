@@ -11,6 +11,33 @@
 
 ## [未发布] — 2026-11-01
 
+### 脚本细节兜底审查（2026-11-01）
+
+对两个维护脚本做上一轮全量审查没覆盖到的边界兜底（空文件 / CRLF / BOM / 嵌套目录 / 退出码 / 误报漏报），
+并逐条核对红线与 CI 口径。未发版，未动三个使用者脚本与 CI 逻辑。
+
+- 修复 守卫漏报 —— `tools/check-secrets.py` 「本机用户目录」的豁免是**整行放行**：
+  同一行里「已脱敏引用 + 完整真实路径」混写时，真实路径跟着漏掉；且旧实现 `search` 只看每行首个命中，
+  同行第二个真值路径永远不查。改为 `finditer` **逐命中段**判断豁免
+- 修复 豁免口径 —— 截断 / 占位用户名写法只对文档类文件生效（[SECRETS.md](docs/SECRETS.md) §3.2
+  正本原本就这么写，旧代码从未实现）；补上占位用户名的**反斜杠**形式（旧正则 `[\/]` 只认正斜杠，
+  `C:\Users\You\...` 会被误报）。旧 `PLACEHOLDER_USER` 正则里还埋着一个 0x08 控制字符
+  （本意 `\b` 词边界）使 `Your` 分支静默失效 —— 该常量随重写移除
+- 修复 `--all` 名不符实 —— 旧实现 `os.walk` 全树、只排除固定目录名单，并不「遵循 `.gitignore`」
+  （[TOOLS.md](docs/TOOLS.md) 登记的口径）；改用 `git ls-files --others --exclude-standard`，
+  vault/ 等本地私有目录不再进扫描，退出码 2（git 故障）补进 docstring
+- 修复 `tools/check-docs.py` 三处边界 —— 文件带 BOM 时首标题锚点会丢（指向首节的链接误报
+  「锚点不存在」，读法改 `utf-8-sig`）；链接指向冻结目录（`docs/archive/` 等）文档的 `#锚点` 必然误报
+  （锚点表没收集这些文件，改为按需补算）；被检目录与仓不同盘符时 `os.path.relpath` 抛 ValueError
+  整个守卫带 traceback 崩掉（Windows），改为回退绝对路径
+- 文档补正本 —— [SECRETS.md](docs/SECRETS.md) §3.1「整行跳过」改为实际的「命中段放行」口径；
+  [TOOLS.md](docs/TOOLS.md) 补 `--all` 模式需 git
+- 验证 —— 两守卫全绿（21 篇 / 60 个文件）；行为矩阵在临时 git 仓实测（混行只报真值、双真值报两处、
+  `.gitignore` 生效、BOM / CRLF / 空文件 / 跨盘符各归位）；`clear-chrome-region.js` 清除集合与红线
+  严格一致（5 个 `variations_*_country` 键 × 顶层 + `variations.` 嵌套，其余键原样、备份 = 改前原文、
+  幂等、坏 JSON 不动、空格路径正常 —— 全部用临时假 profile，未启动 Chrome、未碰真实 profile）；
+  CI 口径 `node --check` / `sh -n` 补跑通过
+
 ### 收尾大扫除（2026-11-01）
 
 按 [docs/MAINTENANCE.md](docs/MAINTENANCE.md) §1 的触发语做一次「大扫除」：§3 证据整理 → §4 副作用复核 → §5 文档对账 → §6 收尾清单。只改文档与清可再生产物，未动代码 / CI 逻辑，未动版本号。

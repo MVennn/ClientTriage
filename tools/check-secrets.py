@@ -4,9 +4,9 @@
 
 用法：
     python tools/check-secrets.py            # 扫描已跟踪文件
-    python tools/check-secrets.py --all      # 扫描工作树（含未跟踪，排除 .git/.work 等）
+    python tools/check-secrets.py --all      # 已跟踪 + 未跟踪一起扫（遵循 .gitignore）
 
-退出码：0 通过 / 1 发现疑似敏感信息。
+退出码：0 通过 / 1 发现疑似敏感信息 / 2 自身故障（git 不可用或失败）。
 规则与 ZcodeAIModels 的守卫完全一致，8 个仓扫同一套口径。
 """
 from __future__ import annotations
@@ -59,8 +59,6 @@ PATTERNS = [
 # 描述性引用，放行；完整路径一律不放行。只对文档类文件生效。
 DOC_FILES = ("CHANGELOG.md", "PROGRESS.md", "SECURITY.md", "CONTRIBUTING.md")
 DOC_PREFIXES = ("docs/", "evidence/", "memories/")
-TRUNCATED_PATH = re.compile(
-    r"[A-Za-z]:[\\/]Users[\\/](?:\.\.\.|<[^>]+>|[A-Za-z0-9._-]+\\\.\.\.)")
 
 
 def tracked_files() -> list[str]:
@@ -75,18 +73,33 @@ def tracked_files() -> list[str]:
     return [x for x in out.stdout.splitlines() if x.strip()]
 
 
-def walk_files() -> list[str]:
-    files = []
-    for dp, dn, fn in os.walk(ROOT):
-        dn[:] = [d for d in dn if d not in SKIP_DIRS]
-        for f in fn:
-            files.append(os.path.relpath(os.path.join(dp, f), ROOT))
-    return files
+def untracked_files() -> list[str]:
+    # --all 的「未跟踪」遵循 .gitignore（docs/TOOLS.md 登记的口径）：
+    # 忽略规则交给 git 判定，gitignore 排除的本地文件（vault/、.work/ 等）不扫。
+    out = subprocess.run(
+        ["git", "ls-files", "--others", "--exclude-standard"],
+        cwd=ROOT, capture_output=True, text=True)
+    if out.returncode != 0:
+        print("✗ git ls-files --others 失败：" + (out.stderr or "").strip())
+        raise SystemExit(2)
+    return [x for x in out.stdout.splitlines() if x.strip()]
 
 
-# 占位用户名：示例文件里的 C:/Users/You/... 是给用户照着改的模板，不是本机路径。
-PLACEHOLDER_USER = re.compile(
-    r"[A-Za-z]:[\/]Users[\/](?:You|User|Your|<[^>]+>|[^\/\s<>]*[一-鿿])", re.I)
+# 「本机用户目录」的豁免按**每个命中段**判断，不做整行放行 ——
+# 整行放行会让同一行里混着的完整真实路径跟着漏掉（守卫最忌讳的漏报）。
+# 豁免只对文档类文件生效（docs/SECRETS.md「推送前脱敏规则」），写法正反斜杠都要认。
+# （下面的示例故意用 `…` 与尖括号占位写，别换成 ASCII 路径字面量 —— 会本文件自拦。）
+def local_path_allowed(seg: str, tail: str) -> bool:
+    user = re.split(r"[\\/]", seg)[-1]
+    if re.fullmatch(r"\.+", user):        # C:\Users\…\file —— 用户名位置就是省略号
+        return True
+    if re.match(r"\\\.\.\.", tail):       # C:\Users\某名\... —— 用户名后紧跟截断
+        return True
+    if re.match(r"You|User", user, re.I): # C:/Users/<你>/… —— 占位用户名模板
+        return True
+    if re.match(r"[一-鿿]", tail):         # C:/Users/<名字>中文/… —— ASCII 前缀续写中文
+        return True
+    return False
 
 
 def is_doc_file(rel: str) -> bool:
@@ -97,7 +110,10 @@ def is_doc_file(rel: str) -> bool:
 
 
 def main() -> int:
-    files = walk_files() if "--all" in sys.argv else tracked_files()
+    if "--all" in sys.argv:
+        files = sorted(set(tracked_files()) | set(untracked_files()))
+    else:
+        files = tracked_files()
     bad = []
     for rel in files:
         if os.path.splitext(rel)[1].lower() in SKIP_EXT:
@@ -113,20 +129,19 @@ def main() -> int:
             with open(os.path.join(ROOT, rel), encoding="utf-8", errors="replace") as fh:
                 for lineno, line in enumerate(fh, 1):
                     for name, pat in PATTERNS:
-                        m = pat.search(line)
-                        if not m:
-                            continue
-                        # 占位符只豁免它自己所在的那一段，不再整行放行 ——
-                        # 示例与真值写在同一行时，真值仍会被报出来。
-                        if PLACEHOLDER.search(m.group(0)):
-                            continue
-                        if name == "本机用户目录":
-                            # 截断形式的描述性引用，或占位用户名（C:/Users/You/）
-                            if TRUNCATED_PATH.search(line):
+                        # finditer：一行里每个命中段都单独过豁免，不整行放行 ——
+                        # search 只看首个命中，同一行里第二个真值路径会漏。
+                        for m in pat.finditer(line):
+                            # 占位符只豁免它自己所在的那一段，不再整行放行 ——
+                            # 示例与真值写在同一行时，真值仍会被报出来。
+                            if PLACEHOLDER.search(m.group(0)):
                                 continue
-                            if PLACEHOLDER_USER.search(line):
-                                continue
-                        bad.append((rel, lineno, name, line.strip()[:120]))
+                            if name == "本机用户目录":
+                                # 截断/占位写法只对文档类文件放行（SECRETS.md 正本）；
+                                # 同一行里其他的完整真实路径仍要报出来。
+                                if allow_truncated and local_path_allowed(m.group(0), line[m.end():]):
+                                    continue
+                            bad.append((rel, lineno, name, line.strip()[:120]))
         except OSError:
             continue
 
