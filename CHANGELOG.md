@@ -20,6 +20,13 @@
 - `docs/MAINTENANCE.md` 巡检命令改用 `verify-prof-*` / `verify-shot-*` 前缀
   （实际目录带 PID 后缀，旧写法永远查不到残留）
 
+### P3 清理（2026-11-04 审查遗留项）
+
+- `tools/verify-gemini.sh` 不再吞 `cdp.js` 的退出码：输出改为变量捕获（避免 `| head`
+  触发 EPIPE 误判），非 0 直接 `die` 并提示 Node 22+ 要求
+- `AGENTS.md` 脚本计数更正（3 → 6 个 + `third-party/` 1 个）
+- 清掉本地回潮的 `tools/__pycache__/`
+
 ## [0.2.2] — 2026-11-01
 
 面向用户的说明见 [docs/release-notes/0.2.2.md](docs/release-notes/0.2.2.md)。

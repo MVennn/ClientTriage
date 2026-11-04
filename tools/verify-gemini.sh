@@ -147,7 +147,10 @@ done
 echo "    CDP 端口就绪"
 
 echo "=== [4/5] 抓控制台/网络（判断 islands bundle 是否还被拦）==="
-CDP_PORT="$CDP_PORT" node "$HERE/cdp.js" 2>&1 | head -60
+CDP_OUT="$(CDP_PORT="$CDP_PORT" node "$HERE/cdp.js" 2>&1)"
+CDP_RC=$?
+printf '%s\n' "$CDP_OUT" | head -60
+[ "$CDP_RC" -eq 0 ] || die "cdp.js 抓取失败（exit $CDP_RC）—— 先确认 Node.js 22+（见 docs/TOOLS.md）且 CDP 端口 $CDP_PORT 可用"
 echo "=== [4b] 截图 ==="
 sleep 2
 STAMP="$(date +%Y%m%d-%H%M%S)"
