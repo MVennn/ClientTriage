@@ -9,6 +9,17 @@
 
 ---
 
+## [未发布]
+
+### Node 22+ 口径统一与巡检对齐（2026-11-04）
+
+- 徽章 / README 环境表 / docs/TOOLS.md / CI 统一为 Node.js 22+（`tools/cdp.js` 硬校验全局
+  `WebSocket`，此前徽章与 TOOLS 写 18+、CI 装 20 与实际不符）
+- `tools/make_social_preview.py` 缺 numpy/Pillow 时给出安装提示；胶囊文案 18+ → 22+ 并
+  重渲染 `assets/social-preview.png`
+- `docs/MAINTENANCE.md` 巡检命令改用 `verify-prof-*` / `verify-shot-*` 前缀
+  （实际目录带 PID 后缀，旧写法永远查不到残留）
+
 ## [0.2.2] — 2026-11-01
 
 面向用户的说明见 [docs/release-notes/0.2.2.md](docs/release-notes/0.2.2.md)。

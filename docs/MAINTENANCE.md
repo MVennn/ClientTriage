@@ -71,7 +71,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 | `evidence/*.png` | 本地长期留存，**不入版本库**（`.gitignore` 已排除 `/evidence/*.png`） | 单张 170 KB 起、体积大、且截图不能证明修复完成 |
 | `evidence/*.log` | 7 天 | 排障过程记录；结论提炼进文档后就没必要留全文 |
 | Chrome 配置备份 `*.bak-region-*` | 保留最近 3 份 | 回滚用；多了分不清哪份对 |
-| 临时 Chrome profile（`%TEMP%\verify-prof`、`verify-shot`） | **每次跑完即删** | `tools/verify-gemini.sh` 的第 5 步负责删；删不掉就是脚本没跑完 |
+| 临时 Chrome profile（`%TEMP%\verify-prof-<PID>`、`verify-shot-<PID>`） | **每次跑完即删** | `tools/verify-gemini.sh` 的第 5 步负责删；删不掉就是脚本没跑完（带 PID 后缀是为并发安全，见 PITFALLS #15） |
 
 **红线**：`evidence/agents/` 下的分片**不许删、不许改写内容**。
 要修正内容就在新的分片里写，并让主会话更新正文档 —— 原文保留是证据链的一部分。
@@ -132,7 +132,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 4. 确认临时 Chrome profile 已删干净（目录在系统临时目录下，`%TEMP%`）：
 
    ```bash
-   ls -d "$TEMP/verify-prof" "$TEMP/verify-shot" 2>/dev/null
+   ls -d "$TEMP"/verify-prof-* "$TEMP"/verify-shot-* 2>/dev/null
    # 有输出就删掉：rm -rf 上面两个目录
    ```
 

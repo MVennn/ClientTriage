@@ -27,7 +27,7 @@ jobs:
       - name: 装 Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Shell 语法
         run: find . -name '*.sh' -not -path './third-party/*' -not -path './node_modules/*' -print0 | xargs -0 -n1 sh -n

@@ -8,7 +8,7 @@
 
 先查客户端，再怪路由器。
 
-![CI](https://github.com/MVennn/ClientTriage/actions/workflows/ci.yml/badge.svg) ![源码仓库](https://img.shields.io/badge/源码仓库-GitHub-181717?logo=github&logoColor=white) ![问题反馈](https://img.shields.io/badge/问题反馈-Issues-181717?logo=github&logoColor=white) ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows&logoColor=white) ![Chrome](https://img.shields.io/badge/Chrome-138%2B-4285F4?logo=googlechrome&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white) ![License](https://img.shields.io/badge/License-MIT-blue)
+![CI](https://github.com/MVennn/ClientTriage/actions/workflows/ci.yml/badge.svg) ![源码仓库](https://img.shields.io/badge/源码仓库-GitHub-181717?logo=github&logoColor=white) ![问题反馈](https://img.shields.io/badge/问题反馈-Issues-181717?logo=github&logoColor=white) ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows&logoColor=white) ![Chrome](https://img.shields.io/badge/Chrome-138%2B-4285F4?logo=googlechrome&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white) ![License](https://img.shields.io/badge/License-MIT-blue)
 
 </div>
 
@@ -28,7 +28,7 @@ Windows 上的 Chrome 经路由器透明代理访问境外服务时，会遇到�
 |---|---|
 | 操作系统 | Windows 10 / 11（工具链依赖 `netsh` / `ssh` / `curl`） |
 | 浏览器 | Chrome 138+（LNA 拦截自这个版本起生效） |
-| 运行时 | Node.js 22+ 与 Git Bash；工具无第三方依赖 |
+| 运行时 | Node.js 22+ 与 Git Bash；使用者工具无第三方依赖（维护脚本 `make_social_preview.py` 例外，需 numpy + Pillow，见 [docs/TOOLS.md](docs/TOOLS.md)） |
 | 代理 | 一个你机器上可达的代理口；连通性测试必须走这个口 |
 
 ## 使用
@@ -77,7 +77,7 @@ CDP_PORT=9223 node tools/cdp.js       # ③ 抓控制台与网络失败
 |---|---|
 | [**Chrome DevTools Protocol**](https://chromedevtools.github.io/devtools-protocol/) | 抓控制台、网络失败与页面渲染状态的标准协议；协议定义快照随仓 vendor，字段可用 `node third-party/verify-cdp-fields.js` 逐个核对 |
 | [**Chrome**](https://www.chromium.org/Chromium/Chromium/) | 被诊断的浏览器本体，提供 `--remote-debugging-port` 接入点 |
-| [**Node.js**](https://nodejs.org/) | 跑全部工具（内置 `fetch` / `WebSocket`，无第三方依赖） |
+| [**Node.js**](https://nodejs.org/) | 跑全部 JS 工具（内置 `fetch` / `WebSocket`，无第三方依赖；Python 侧维护脚本依赖见 [docs/TOOLS.md](docs/TOOLS.md)） |
 
 ## 许可证
 
