@@ -283,3 +283,17 @@ CDP 端口 40 秒未就绪、截图 0 字节。失败时保留临时 profile 并
 - **解法**：每条请求带超时（`Promise.race` 或定时器 + reject），监听 `close`/`error`
   并把所有挂起请求 reject；启动时检测运行环境（Node 22+ 才有全局 `WebSocket`）。
 - **验证**：抓取过程中手动杀掉 Chrome，确认脚本以非零退出而不是挂起。
+
+## 19. 门禁脚本用 `✓` / `✗` 打结论，GBK 控制台下把自己判成失败 【通用】
+
+- **现象**：Windows 中文控制台（cp936）跑 `python -I tools/check-docs.py`，最后一行
+  `print(f"✓ …")` 抛 `UnicodeEncodeError: 'gbk' codec can't encode character '\u2713'`，
+  脚本以**退出码 1** 结束 —— 检查其实全过，门禁却报红。CI 是 UTF-8，看不到，能长期潜伏。
+- **根因**：`✓` U+2713 / `✗` U+2717 / `⚠` U+26A0 不在 cp936 码表，`sys.stdout` 在这个环境里
+  就是 `gbk`；`python -I` 会把 `PYTHONIOENCODING` / `PYTHONUTF8` 一起忽略，所以「设个环境变量」
+  不是解法 —— 必须改脚本。
+- **解法**：结论行只用 ASCII（`[OK]` / `[FAIL]` / `[!]`）；入口再加
+  `if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(errors="replace")`，
+  非 GBK 字符降级成 `?` 而不是抛异常。同一问题首次记录见 ZcodeAIModels 仓「踩坑总汇」第 36 节（跨仓引用，非本仓路径）。
+- **验证**：`python -I tools/check-docs.py` → `[OK] …`、退出码 0；反证：把 `✓` 改回原样，
+  同一命令退出码 1 并抛 `UnicodeEncodeError`。
