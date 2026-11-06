@@ -154,6 +154,6 @@ Release 说明里都得能找到对应行**。叙事留在 CHANGELOG，说明只
 **不要**直接改已经对外的说明内容而不 bump 版本 —— 那会让 CHANGELOG 与说明对不上。
 
 写完 `docs/release-notes/<版本>.md`、在根 `CHANGELOG.md` 顶部补该版本段落、
-打一个同名的 tag（`vX.Y.Z`），发布流程就会用它当 Release 说明；
+打一个 tag（`vX.Y.Z`；`v` 前缀只属于 tag，文档与文件名用 `X.Y.Z`），发布流程就会用它当 Release 说明；
 找不到对应文件时退回 CHANGELOG 的对应段落（并在日志里 `::warning::` ——
 那段是写给开发者的，使用者看到的是噪音）。
