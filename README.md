@@ -16,7 +16,7 @@
 
 ## 这是什么
 
-Windows 上的 Chrome 经路由器透明代理访问境外服务时，会遇到一批**看起来像客户端坏了、实际根因在网络层**的问题：Gemini 页面只剩一个输入框、Chrome 扩展装不上并报 `Image decode failed`、Google 账号被判定为不支持的国家、流媒体打不开、社交媒体加载不全。
+Windows 上的 Chrome 经路由器透明代理访问境外服务时，会遇到一批**看起来像客户端坏了、实际根因在网络层**的问题：Gemini 页面只剩一个输入框、Chrome 扩展装不上并报 `Image decode failed`、Play 更新一直转圈、Google 账号被判定为不支持的国家、流媒体打不开、社交媒体加载不全。
 
 本仓沉淀的是**客户端侧怎么查**：用 CDP 接管你的浏览器，把「只剩一个输入框」变成一条明确的控制台错误；用 Chrome 地区种子清理摘掉账号与设备侧的残留因素；再用只读判定手法（服务方自己的国家标记 / 出口链路 / GET 判 302）查清「到底是谁在拦」，并留下可复核的证据。
 
@@ -36,7 +36,7 @@ Windows 上的 Chrome 经路由器透明代理访问境外服务时，会遇到�
 三步，顺序不能换：**先清种子，再复测，最后才抓控制台** —— 种子没清就抓控制台，抓到的是带地区因子的噪声。
 
 1. **清 Chrome 地区种子** —— 先把 Chrome 完全退出（含后台进程），再跑第 ① 条；脚本写前会留 `.bak-region-*` 备份。
-2. **复测 Gemini** —— 跑第 ② 条；它会切 WiFi、起一个临时 Chrome、抓控制台并截图，结束后清理、切回热点，你日常那个 Chrome 全程不会被碰（其中的路由器侧检查需要 root 权限，没有就跳过那一步）。
+2. **复测 Gemini** —— 跑第 ② 条；它会切 WiFi、起一个临时 Chrome、抓控制台并截图，结束后清理、切回热点，你日常那个 Chrome 全程不会被碰。跑之前先把两个 WiFi 名给上（`SSID_ROUTER` / `SSID_HOTSPOT`，还是占位符就直接退出码 2）；路由器侧那一步是用 `ssh root@$ROUTER_IP` 跑兄弟仓的检查脚本（默认取同级 `AX3000TOpenwrt` 的 `recovery/archive/verify-fix.sh`，可用 `SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 覆盖），ssh 不通就中止 —— 没有「跳过路由器侧」这条路；变量表见 [凭据与配置](https://github.com/MVennn/ClientTriage/blob/main/docs/SECRETS.md)。
 3. **抓控制台 / 网络失败** —— 跑第 ③ 条；只读，不改浏览器设置，前提是 9223 上已经有一个开着 `--remote-debugging-port` 的 Chrome。
 
 ```bash
@@ -45,7 +45,7 @@ bash tools/verify-gemini.sh           # ② 复测 Gemini
 CDP_PORT=9223 node tools/cdp.js       # ③ 抓控制台与网络失败
 ```
 
-三个工具的完整用法、副作用与前置条件见 [工具清单](https://github.com/MVennn/ClientTriage/blob/main/docs/TOOLS.md)；已知坑见 [踩坑总汇](https://github.com/MVennn/ClientTriage/blob/main/docs/PITFALLS.md)；机制与判据见 [LNA × fake-IP](https://github.com/MVennn/ClientTriage/blob/main/docs/LNA-FAKE-IP.md)。
+三个工具的完整用法、副作用与前置条件见 [工具清单](https://github.com/MVennn/ClientTriage/blob/main/docs/TOOLS.md)；已知坑见 [踩坑总汇](https://github.com/MVennn/ClientTriage/blob/main/docs/PITFALLS.md)；机制与判据见 [LNA × fake-IP](https://github.com/MVennn/ClientTriage/blob/main/docs/LNA-FAKE-IP.md)；docs/ 下 10 篇正文的分类索引见 [docs/ 索引](https://github.com/MVennn/ClientTriage/blob/main/docs/README.md)。
 
 ## 反馈
 

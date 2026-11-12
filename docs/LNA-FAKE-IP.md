@@ -1,9 +1,11 @@
-# LNA × fake-IP：Chrome 155 与 mihomo fake-IP 的冲突
+# LNA × fake-IP：Chrome 155 实测的 LNA 与 mihomo fake-IP 冲突
 
 > **一句话**：mihomo 的 fake-IP 段（`198.18.0.0/15`、`fc00::/16`）被 Chrome 155 的
 > **Local Network Access（LNA）**判为「本地地址空间」，从公网页面发起的子资源请求会被
 > LNA 拦掉（`ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS`）—— 这就是 Gemini 只剩输入框、
 > 扩展安装报 `Image decode failed` 的共同根因。
+>
+> **版本口径**：LNA 自 Chrome **138** 起引入，本篇的实测快照是 Chrome **155**（见 [VERIFIED-ENV.md](VERIFIED-ENV.md)）。
 
 > **本文是长期正本**。2026-10-19 的阶段性诊断见
 > [CHROME-GOOGLE-DIAGNOSIS.md](CHROME-GOOGLE-DIAGNOSIS.md)，其中「方案 A/C/D 已落地并端到端验证」
