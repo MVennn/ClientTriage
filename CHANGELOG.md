@@ -9,6 +9,35 @@
 
 ---
 
+## [0.2.4] — 2026-11-12
+
+> 补丁版本：只做口径跟进与门面修订，没有新增能力（进位依据见 [docs/VERSIONING.md](docs/VERSIONING.md) §1）。
+
+### 门面与工具前置条件写实（2026-11-12）
+
+- 调整 `README.md`：「这是什么」的现象清单补「Play 更新一直转圈」；第 2 步 `verify-gemini.sh`
+  写明必须先给 `SSID_ROUTER` / `SSID_HOTSPOT`（占位符即退出码 2）、路由器侧是
+  `ssh root@$ROUTER_IP` 跑兄弟仓脚本、**ssh 不通即中止（没有跳过分支）**；参考链接补 `docs/` 索引。
+  原文写「路由器侧检查需要 root，没有就跳过那一步」，与脚本实际的退出码 2 / `die` 不符。
+- 调整 `docs/TOOLS.md`：`verify-gemini.sh` 的前置条件补全 —— 两个 WiFi 名必须给值，
+  兄弟仓默认按目录名 `AX3000TOpenwrt` 取 `recovery/local-tools/askpass.sh` 与
+  `recovery/archive/verify-fix.sh`（`SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 可覆盖）；
+  原文只写「兄弟仓同级」，没交代变量名，也没写「ssh 不通即中止」这条硬前置。
+- 调整 `docs/LNA-FAKE-IP.md`：标题标注「Chrome 155 实测」，引言块补**版本口径** ——
+  LNA 自 Chrome 138 起引入，本篇实测快照是 155（指向 `VERIFIED-ENV.md`）。
+
+### 仓名与文档规则口径同步（2026-11-12）
+
+- 修复 `docs/PITFALLS.md`、`tools/check-secrets.py`：跨仓引用仓名 `ZcodeAIModels` → `ModelBus`
+  （网关仓已改名，旧称指向不存在的仓）；守卫说明句「8 个仓扫同一套口径」改为「系列各仓」。
+- 调整 `docs/DOC-RULES.md`：链接纪律的示例改成行内代码（示例文件名不是真实目标，渲染成链接会被误点）。
+- 调整 `docs/SECRETS.md`：守卫正则示例补水一句「仅作示例，必须保持截断 / 占位形式」。
+- 调整 `docs/release-notes/README.md`：发布流程补「`v` 前缀只属于 tag，文档与文件名用 `X.Y.Z`」。
+- 调整 `memories/README.md`：`memories/` 定位从「记忆库快照」改为 dsh-mnemon
+  「项目记忆：ClientTriage」Document 的随 git 快照，并写清正本与路由（`~/.mnemon` / `DOCUMENTS-ROUTING.md`）。
+
+---
+
 ## [0.2.3] — 2026-11-06
 
 ### 门禁脚本 GBK 控制台自毁修复（2026-11-04）

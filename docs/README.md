@@ -39,7 +39,8 @@
 | [VERIFIED-ENV.md](VERIFIED-ENV.md) | 已验证环境：方法被实测过的设备、网段、出口快照与兄弟仓名对照 |
 | [CHROME-GOOGLE-DIAGNOSIS.md](CHROME-GOOGLE-DIAGNOSIS.md) | 2026-10-19 阶段性诊断原文：扩展安装 `Image decode failed`、Play 更新转圈的证据链；⚠️ 结论已被 [LNA-FAKE-IP.md](LNA-FAKE-IP.md) 修正 |
 | [release-notes/](release-notes/README.md) | 面向使用者的 Release 说明，一版一份，文件名 = `versionName`（不带 `v`） |
-| [release-notes/0.2.3.md](release-notes/0.2.3.md) | 最近一份 Release 说明：verify-gemini 退出码兜底与 Node 22+ 口径统一，门禁 GBK 自毁修复 |
+| [release-notes/0.2.4.md](release-notes/0.2.4.md) | 最近一份 Release 说明：口径跟进 —— 门面与工具前置条件写实、仓名改 ModelBus |
+| [release-notes/0.2.3.md](release-notes/0.2.3.md) | 0.2.3 说明：verify-gemini 退出码兜底与 Node 22+ 口径统一，门禁 GBK 自毁修复 |
 | [archive/](archive/) | 一次性归档目录（**当前为空**）：阶段性结论的原文留档处，不进索引条目 |
 | `../evidence/agents/` | 9 份子代理只读审计分片：浏览器层、干净出口、IP 声誉、Google 其余服务、OpenAI、流媒体、社交媒体、YouTube、PC 侧 —— 原始证据逐字保留 |
 | `../tools/` | 三个使用者工具（清地区种子 / Gemini 复测 / CDP 抓控制台）+ 三个维护脚本（文档自检 / 敏感信息守卫 / 门面图）；用法见 [TOOLS.md](TOOLS.md) |
