@@ -297,3 +297,38 @@ CDP 端口 40 秒未就绪、截图 0 字节。失败时保留临时 profile 并
   非 GBK 字符降级成 `?` 而不是抛异常。同一问题首次记录见 ModelBus 仓「踩坑总汇」第 36 节（跨仓引用，非本仓路径）。
 - **验证**：`python -I tools/check-docs.py` → `[OK] …`、退出码 0；反证：把 `✓` 改回原样，
   同一命令退出码 1 并抛 `UnicodeEncodeError`。
+
+## 20. 改 Chrome 配置文件不能用「截断再写」 【通用】
+
+- **现象**：写 `Local State` 的过程中被 Ctrl-C / 断电 / 杀进程，文件留下半截 JSON，
+  Chrome 启动读不了它，**整个用户配置被重置** —— 比不清地区种子严重得多。
+- **根因**：`fs.writeFileSync` 是「先 `O_TRUNC` 再写」，进程死在两次写之间，磁盘上就是残缺文件；
+  而 Chrome 的配置没有校验和，坏一次就丢一次。
+- **解法**：`tools/lib/common.js` 的 `atomicWriteFile()` —— 同目录临时文件
+  （`.<文件名>.tmp-<pid>-<ms>`）→ `fsync` → `renameSync` 覆盖；`rename` 失败时删临时文件
+  并回退为直接写。**同目录是关键**：跨盘 `rename` 不是原子操作。
+- **验证**：`node tools/clear-chrome-region.js --dry-run` 不写任何文件；真跑一次后
+  `Local State` 仍是合法 JSON，目录里没有残留 `.tmp-*`。
+
+## 21. CDP 抓取不设上限、不过滤控制字符 【通用】
+
+- **现象**：长会话或死循环页面下，`cdp.js` 的事件数组无限增长；页面标题 / 控制台文本里夹的
+  ANSI 转义与回车能把终端里上一行结论覆盖掉 —— 证据看着像「已通过」。
+- **根因**：`Log.entryAdded` / `Runtime.consoleAPICalled` 每个事件都推一条，没有上限；
+  被诊断页面给的是**不可信文本**，原样 `print` 就是日志注入面。
+- **解法**：`CAPS = { log: 200, console: 200, exception: 100, failed: 200, resp: 400 }` 逐类封顶，
+  超出只累计 `seen` 并在 JSON 里给 `truncated` 标记；所有外部字符串过 `sanitize()`
+  （剥 ANSI CSI / OSC / DCS，`\u0000-\u001f` 与控制符转空格，压空白，按需截断）。
+- **验证**：`node tools/cdp.js --json` 的 `truncated` 字段；拿一个标题里带 `\u001b[2K\r` 的页面试，
+  输出里不出现转义序列。
+
+## 22. 临时目录取到根目录时 `rm -rf` 会删到系统目录 【通用】
+
+- **现象**：`TMPDIR=/` 或 `TEMP=C:/` 时，`verify-gemini.sh` 拼出的 `//verify-prof-$$` 落在根上，
+  清理分支直接对它 `rm -rf`。
+- **根因**：脚本假设 `TMPDIR` 一定是「可写的普通目录」，没校验；`${TMPDIR%/}` 把 `/` 归一成
+  空串，拼出来就是顶级路径。
+- **解法**：`tmp_base_ok()` 在归一后拒绝空、`/`、`//`、单字母盘符根（`/c`、`C:`、`C:/`、`C:\`）
+  与 `/mnt/<盘>` 形式，打印实际取值后 `exit 2`；两个临时目录名都带 `$$`。
+- **验证**：`TMPDIR=/ bash tools/verify-gemini.sh --status` → `!! 临时目录不可用…`、退出码 2；
+  `/`、`C:/`、`/c` 三种形式逐个试过。

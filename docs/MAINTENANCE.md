@@ -68,7 +68,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 | 对象 | 期限 | 理由 |
 |---|---|---|
 | `evidence/agents/*.md` | **永久** | 原始证据。结论被正文档吸收后**也不删** —— 那时的结论也是当时的事实（见 [DOC-RULES.md](DOC-RULES.md) §3） |
-| `evidence/*.png` | 本地长期留存，**不入版本库**（`.gitignore` 已排除 `/evidence/*.png`） | 单张 170 KB 起、体积大、且截图不能证明修复完成 |
+| `evidence/*.png` | 本地长期留存，**不入版本库**（`.gitignore` 已排除 `/evidence/*.png`）；`gemini-after-*.png` 只留最近 `KEEP_SHOTS`（默认 10）份，由脚本自动轮转 | 单张 170 KB 起、体积大、且截图不能证明修复完成 |
 | `evidence/*.log` | 7 天 | 排障过程记录；结论提炼进文档后就没必要留全文 |
 | Chrome 配置备份 `*.bak-region-*` | 保留最近 3 份 | 回滚用；多了分不清哪份对 |
 | 临时 Chrome profile（`%TEMP%\verify-prof-<PID>`、`verify-shot-<PID>`） | **每次跑完即删** | `tools/verify-gemini.sh` 的第 5 步负责删；删不掉就是脚本没跑完（带 PID 后缀是为并发安全，见 PITFALLS #15） |
@@ -94,6 +94,7 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 | `tools/clear-chrome-region.js` | 改写 Chrome 的 `Local State` 与 `Default/Preferences`（写前留 `.bak-region-<ts>` 备份） | [TOOLS.md](TOOLS.md) 工具表 + [PITFALLS.md](PITFALLS.md) |
 | `tools/verify-gemini.sh` | **切换本机 WiFi**（切到路由器 → 切回热点）；起一个临时 Chrome 进程；删临时 profile；截图写到本仓 `evidence/gemini-after.png` | [TOOLS.md](TOOLS.md) 工具表 + [PITFALLS.md](PITFALLS.md) |
 | `tools/cdp.js` | 无（只读；连的是已经起好的 Chrome） | [TOOLS.md](TOOLS.md) 工具表 |
+| `tools/doctor.js` | 无（只读体检）；**只有 `--write-status` 会写** `.work/triage-status.json` | [TOOLS.md](TOOLS.md) 工具表 |
 
 **新增或改动副作用时**，按 [DOC-RULES.md](DOC-RULES.md) §5 的触发矩阵同步四处：
 [TOOLS.md](TOOLS.md) 工具表、[PITFALLS.md](PITFALLS.md)、本篇 §4 的表。
@@ -164,3 +165,4 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 | 2026-10-20 | **本仓建仓**：从原多仓工作区拆出，补齐 README / AGENTS / CHANGELOG / NOTICE / `.gitignore` / `docs/**` 全套文档 | 仓库可独立上传 GitHub、独立看懂 |
 | 2026-10-22 | 收尾大扫除：复核临时 Chrome profile / 残留进程 / `__pycache__` / 过期日志与备份；对齐 `docs/README.md` 索引与 [TOOLS.md](TOOLS.md) 的脚本清单（补两个维护脚本）；Release 说明补「反馈入口」规则 | 临时 profile 与残留进程均为 0，仓库无 L1 垃圾；`python tools/check-docs.py` 退出码 0 |
 | 2026-11-01 | 收尾大扫除：清 `tools/__pycache__`；复核临时 Chrome profile / 残留进程 / 过期日志 / 多余备份（均无可清项）；对齐 [TOOLS.md](TOOLS.md) 与 `docs/README.md` 索引的脚本清单（补 10-24 批漏登记的 `check-secrets.py`） | 临时 profile 与残留进程均为 0，仓库无 L1 垃圾；`python tools/check-docs.py` 退出码 0（21 篇） |
+| 2026-11-14 | 工具层加固：新增只读体检 `tools/doctor.js`（13 项）与共享层 `tools/lib/region.js`；`verify-gemini.sh` 加 `--status` / `--help` / `trap` 兜底 / 临时根目录守卫 / `ROUTER_IP` 形状校验 / 截图轮转；[TOOLS.md](TOOLS.md)、[SECRETS.md](SECRETS.md) §3.5、[PITFALLS.md](PITFALLS.md) #20–#22 同步 | `node tools/doctor.js` 退出码 0（10 通过 / 3 告警）；`bash -n` 与 `node --check` 全 0；`python tools/check-docs.py` 退出码 0 |

@@ -57,3 +57,6 @@ desktop.ini
 
 # 注意：源码（tools/）、文档（docs/）、证据分片（evidence/agents/*.md）
 # 一律**不排除** —— 它们是本仓的价值所在。
+
+# DSH 会话认领边车（不入库）
+*.dshclaim

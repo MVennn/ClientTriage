@@ -125,7 +125,8 @@ tools/verify-gemini.sh
 | **`ROUTER_IP`** | `tools/verify-gemini.sh` —— 路由器的 LAN 地址 | 示例值 `192.168.1.1` | 用默认值 |
 | **`CDP_PORT`** | `tools/verify-gemini.sh` / `tools/cdp.js` —— Chrome 调试端口 | `9223`（脚本）/ `9222`（`cdp.js`） | 用默认值 |
 | **`CHROME`** | `tools/verify-gemini.sh` —— chrome.exe 完整路径 | **自动探测**（常见安装路径 → `where chrome` → 注册表 App Paths） | 探测不到时**报错退出**，并提示用 `CHROME` 指定 |
-| **`CHROME_USER_DATA`** | `tools/clear-chrome-region.js` —— Chrome 用户数据目录 | **自动探测**（`%LOCALAPPDATA%\Google\Chrome\User Data`） | 用自动探测结果 |
+| **`CHROME_USER_DATA`** | `tools/clear-chrome-region.js` / `tools/doctor.js` —— Chrome 用户数据目录 | **自动探测**（`%LOCALAPPDATA%\Google\Chrome\User Data`） | 用自动探测结果 |
+| **`KEEP_SHOTS`** | `tools/verify-gemini.sh` —— 截图保留份数（超出按修改时间从旧到新删） | `10` | 用默认值 |
 | **`ROUTER_PASSWORD`** | **不在本仓** —— 由兄弟仓的 `recovery/local-tools/askpass.sh` 读 | 无 | 那个脚本报错退出（exit 1），不静默 |
 
 > `tools/cdp.js` 的 `CDP_PORT` / `CDP_URL` 与凭据**无关**（只是 Chrome 调试端口），

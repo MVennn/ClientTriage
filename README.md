@@ -26,7 +26,7 @@ Windows 上的 Chrome 经路由器透明代理访问境外服务时，会遇到�
 
 | 项 | 要求 |
 |---|---|
-| 操作系统 | Windows 10 / 11（工具链依赖 `netsh` / `ssh` / `curl`） |
+| 操作系统 | Windows 10 / 11（工具链依赖 `netsh` / `ssh`） |
 | 浏览器 | Chrome 138+（LNA 拦截自这个版本起生效） |
 | 运行时 | Node.js 22+ 与 Git Bash；使用者工具无第三方依赖（维护脚本 `make_social_preview.py` 例外，需 numpy + Pillow，见 [docs/TOOLS.md](docs/TOOLS.md)） |
 | 代理 | 一个你机器上可达的代理口；连通性测试必须走这个口 |
@@ -34,18 +34,20 @@ Windows 上的 Chrome 经路由器透明代理访问境外服务时，会遇到�
 ## 使用
 
 三步，顺序不能换：**先清种子，再复测，最后才抓控制台** —— 种子没清就抓控制台，抓到的是带地区因子的噪声。
+动手前先跑一次 `node tools/doctor.js`（只读体检，13 项，不改任何文件；`--json` 给机器读）。
 
 1. **清 Chrome 地区种子** —— 先把 Chrome 完全退出（含后台进程），再跑第 ① 条；脚本写前会留 `.bak-region-*` 备份。
 2. **复测 Gemini** —— 跑第 ② 条；它会切 WiFi、起一个临时 Chrome、抓控制台并截图，结束后清理、切回热点，你日常那个 Chrome 全程不会被碰。跑之前先把两个 WiFi 名给上（`SSID_ROUTER` / `SSID_HOTSPOT`，还是占位符就直接退出码 2）；路由器侧那一步是用 `ssh root@$ROUTER_IP` 跑兄弟仓的检查脚本（默认取同级 `AX3000TOpenwrt` 的 `recovery/archive/verify-fix.sh`，可用 `SIBLING_REPO` / `ASKPASS` / `VERIFY_FIX` 覆盖），ssh 不通就中止 —— 没有「跳过路由器侧」这条路；变量表见 [凭据与配置](https://github.com/MVennn/ClientTriage/blob/main/docs/SECRETS.md)。
 3. **抓控制台 / 网络失败** —— 跑第 ③ 条；只读，不改浏览器设置，前提是 9223 上已经有一个开着 `--remote-debugging-port` 的 Chrome。
 
 ```bash
+node tools/doctor.js                 # ⓪ 体检（只读，随时可跑）
 node tools/clear-chrome-region.js    # ① 清地区种子（Chrome 需完全退出）
 bash tools/verify-gemini.sh           # ② 复测 Gemini
 CDP_PORT=9223 node tools/cdp.js       # ③ 抓控制台与网络失败
 ```
 
-三个工具的完整用法、副作用与前置条件见 [工具清单](https://github.com/MVennn/ClientTriage/blob/main/docs/TOOLS.md)；已知坑见 [踩坑总汇](https://github.com/MVennn/ClientTriage/blob/main/docs/PITFALLS.md)；机制与判据见 [LNA × fake-IP](https://github.com/MVennn/ClientTriage/blob/main/docs/LNA-FAKE-IP.md)；docs/ 下 10 篇正文的分类索引见 [docs/ 索引](https://github.com/MVennn/ClientTriage/blob/main/docs/README.md)。
+四个工具的完整用法、副作用与前置条件见 [工具清单](https://github.com/MVennn/ClientTriage/blob/main/docs/TOOLS.md)；已知坑见 [踩坑总汇](https://github.com/MVennn/ClientTriage/blob/main/docs/PITFALLS.md)；机制与判据见 [LNA × fake-IP](https://github.com/MVennn/ClientTriage/blob/main/docs/LNA-FAKE-IP.md)；docs/ 下 10 篇正文的分类索引见 [docs/ 索引](https://github.com/MVennn/ClientTriage/blob/main/docs/README.md)。
 
 ## 反馈
 

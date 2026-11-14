@@ -9,6 +9,31 @@
 
 ---
 
+## [未发布]
+
+> 待发版：工具层加固（只读体检、共享实现、清理兜底）。版本号进位在发版时按
+> [docs/VERSIONING.md](docs/VERSIONING.md) 判定 —— 本轮新增了 `tools/doctor.js` 与多个只读子命令，
+> 属功能更新，不属补丁。
+
+### 工具层：只读体检与共享实现（2026-11-14）
+
+- 新增 `tools/doctor.js`：13 项只读体检（Node ≥ 22 / `fetch` / 全局 `WebSocket` / Chrome 进程与
+  用户数据目录 / 地区种子 / CDP 端口 / Git Bash / 兄弟仓脚本 / `evidence/` / 统一状态文件）；
+  `--json` 机器可读，`--write-status` 才写 `.work/triage-status.json`；退出码 0 通过或有告警 /
+  1 有失败项 / 2 用法错误。
+- 新增 `tools/lib/region.js`：地区键判据单点实现（`KEYS` / `regionFiles` / `inspectRegionFile` /
+  `stripRegionKeys` / `regionReport`），`clear-chrome-region.js` 与 `doctor.js` 共用 ——
+  否则「体检说干净、清理说脏」是迟早的事。
+- 调整 `tools/verify-gemini.sh`：加 `--status` 只读体检与 `--help`；端口检查改用
+  `node tools/cdp.js --status`（删掉两处 `curl`）；`trap` 统一兜底（正常结束与 Ctrl-C 都杀本
+  PID 的临时 Chrome、删临时目录、切回热点）；`TMPDIR` 取到根目录时拒绝执行；`ROUTER_IP`
+  形状校验（拒绝分号 / 空格）；截图按 `KEEP_SHOTS`（默认 10）轮转；退出码明确为 0/1/2。
+- 调整 `docs/TOOLS.md` / `docs/SECRETS.md` / `docs/MAINTENANCE.md` / `docs/PITFALLS.md`：
+  登记新工具与只读入口、`KEEP_SHOTS`、三个新坑位（#20 原子写、#21 事件上限与日志注入、
+  #22 临时根目录守卫）。
+
+---
+
 ## [0.2.4] — 2026-11-12
 
 > 补丁版本：只做口径跟进与门面修订，没有新增能力（进位依据见 [docs/VERSIONING.md](docs/VERSIONING.md) §1）。
