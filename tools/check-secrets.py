@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""公开仓敏感信息扫描：凭据 + 本机路径 + 真实邮箱（ClientTriage）。
+"""公开仓敏感信息扫描：凭据 + 本机路径 + 真实邮箱（系列仓统一版）。
 
 用法：
     python tools/check-secrets.py            # 扫描已跟踪文件
     python tools/check-secrets.py --all      # 已跟踪 + 未跟踪一起扫（遵循 .gitignore）
 
 退出码：0 通过 / 1 发现疑似敏感信息 / 2 自身故障（git 不可用或失败）。
-规则与 ModelBus 的守卫完全一致，系列各仓扫同一套口径。
+这是 `docs/SECRETS.md` 的可执行版本 —— 文档说「本仓不保存凭据与本机路径」，
+CI 里得有个脚本真的能拦住。
+
+比通用版多两条规则，都是本系列真实踩过的坑：
+  - 本机用户目录（`C:\\Users\\<名字>`）：脚本把 `--config` 的绝对路径回显到
+    报告里，报告又作为 evidence 提交，于是本机路径进了版本库。
+  - 真实邮箱域名：报告里夹带过登录账号。
 """
 from __future__ import annotations
 
@@ -20,20 +26,15 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(errors="replace")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 跳过目录：并集保留各仓曾有过的有效项（vault/app/build/public 等）
+SKIP_DIRS = {".codegraph", ".git", ".work", "__pycache__", "app", "build", "dist",
+             "node_modules", "public", "third-party", "venv", "vault"}
 SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".gz", ".pyc",
             ".woff", ".woff2", ".zip", ".mrs", ".svg", ".webp", ".jar"}
 
 # 占位符与示例行不算命中
 PLACEHOLDER = re.compile(
     r"REDACTED|YOUR-|REPLACE-|<[^>]+>|example\.(com|org|net)|placeholder|<用户名>", re.I)
-
-SKIP_DIRS = {".codegraph", ".git", ".work", "__pycache__", "app", "build", "dist", "node_modules", "third-party", "venv"}
-SKIP_PREFIXES = ()
-
-
-def base_skip(rel: str) -> bool:
-    return False
-
 
 PATTERNS = [
     ("私钥块", re.compile(r"-----BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----")),
@@ -62,6 +63,20 @@ PATTERNS = [
 # 描述性引用，放行；完整路径一律不放行。只对文档类文件生效。
 DOC_FILES = ("CHANGELOG.md", "PROGRESS.md", "SECURITY.md", "CONTRIBUTING.md")
 DOC_PREFIXES = ("docs/", "evidence/", "memories/")
+# 描述性引用：用户名被 `...` / `<...>` 取代，或用户名后紧跟 `\...` 截断
+TRUNCATED_PATH = re.compile(
+    r"[A-Za-z]:[\\/]Users[\\/](?:\.\.\.|<[^>]+>|[A-Za-z0-9._-]+\\\.\.\.)")
+
+
+# 占位用户名：示例文件里的 C:/Users/You/... 是给用户照着改的模板，不是本机路径。
+# 反斜杠写法同样要认；旧正则只认正斜杠，且 Your 后内嵌的字面 0x08（本意 \b）随此重写移除。
+PLACEHOLDER_USER = re.compile(
+    r"[A-Za-z]:[\\/]Users[\\/](?:You|User|<[^>]+>|[^\\/\s<>]*[一-鿿])", re.I)
+
+
+def base_skip(rel: str) -> bool:
+    """共享层跳过钩子：本脚本独立自带，默认不额外跳过；需要时各仓在此按相对路径扩展。"""
+    return False
 
 
 def tracked_files() -> list[str]:
@@ -77,8 +92,8 @@ def tracked_files() -> list[str]:
 
 
 def untracked_files() -> list[str]:
-    # --all 的「未跟踪」遵循 .gitignore（docs/TOOLS.md 登记的口径）：
-    # 忽略规则交给 git 判定，gitignore 排除的本地文件（vault/、.work/ 等）不扫。
+    # --all 的「未跟踪」遵循 .gitignore：忽略规则交给 git 判定，
+    # gitignore 排除的本地文件（vault/、.work/ 等）不进扫描。
     out = subprocess.run(
         ["git", "ls-files", "--others", "--exclude-standard"],
         cwd=ROOT, capture_output=True, text=True)
@@ -86,23 +101,6 @@ def untracked_files() -> list[str]:
         print("[FAIL] git ls-files --others 失败：" + (out.stderr or "").strip())
         raise SystemExit(2)
     return [x for x in out.stdout.splitlines() if x.strip()]
-
-
-# 「本机用户目录」的豁免按**每个命中段**判断，不做整行放行 ——
-# 整行放行会让同一行里混着的完整真实路径跟着漏掉（守卫最忌讳的漏报）。
-# 豁免只对文档类文件生效（docs/SECRETS.md「推送前脱敏规则」），写法正反斜杠都要认。
-# （下面的示例故意用 `…` 与尖括号占位写，别换成 ASCII 路径字面量 —— 会本文件自拦。）
-def local_path_allowed(seg: str, tail: str) -> bool:
-    user = re.split(r"[\\/]", seg)[-1]
-    if re.fullmatch(r"\.+", user):        # C:\Users\…\file —— 用户名位置就是省略号
-        return True
-    if re.match(r"\\\.\.\.", tail):       # C:\Users\某名\... —— 用户名后紧跟截断
-        return True
-    if re.match(r"You|User", user, re.I): # C:/Users/<你>/… —— 占位用户名模板
-        return True
-    if re.match(r"[一-鿿]", tail):         # C:/Users/<名字>中文/… —— ASCII 前缀续写中文
-        return True
-    return False
 
 
 def is_doc_file(rel: str) -> bool:
@@ -117,6 +115,9 @@ def main() -> int:
         files = sorted(set(tracked_files()) | set(untracked_files()))
     else:
         files = tracked_files()
+    if not files:
+        print("[FAIL] 没有可扫描的文件（git ls-files 输出为空，检查是否在仓库内）")
+        return 2
     bad = []
     for rel in files:
         if os.path.splitext(rel)[1].lower() in SKIP_EXT:
@@ -126,7 +127,7 @@ def main() -> int:
             continue
         if base_skip(rel):
             continue
-        # 文档类文件允许描述性引用泄漏原文，但必须是截断形式
+        # 文档类文件允许描述性引用泄漏原文，但必须是截断形式（`...\` 之后无层级）
         allow_truncated = is_doc_file(rel)
         try:
             with open(os.path.join(ROOT, rel), encoding="utf-8", errors="replace") as fh:
@@ -140,9 +141,13 @@ def main() -> int:
                             if PLACEHOLDER.search(m.group(0)):
                                 continue
                             if name == "本机用户目录":
-                                # 截断/占位写法只对文档类文件放行（SECRETS.md 正本）；
-                                # 同一行里其他的完整真实路径仍要报出来。
-                                if allow_truncated and local_path_allowed(m.group(0), line[m.end():]):
+                                # 只豁免命中片段本身：截断形式（C:/Users/<用户名>\...）或
+                                # 占位用户名（C:/Users/You）。同一行里并排写下的
+                                # 完整真实路径仍会被报出来。
+                                frag = line[m.start():m.start() + 120]
+                                if allow_truncated and TRUNCATED_PATH.match(frag):
+                                    continue
+                                if PLACEHOLDER_USER.match(frag):
                                     continue
                             bad.append((rel, lineno, name, line.strip()[:120]))
         except OSError:

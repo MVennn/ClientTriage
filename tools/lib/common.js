@@ -305,6 +305,23 @@ async function waitForCdp(port, timeoutMs, intervalMs = 500) {
   return last;
 }
 
+// Node 版本判据（唯一真源）：cdp.js 抓取依赖全局 WebSocket，必须 Node >= 22。
+// doctor.js 与 verify-gemini.sh 都走这里，避免一处 warn、一处 FAIL。
+const MIN_NODE_MAJOR = 22;
+function nodeMajor() {
+  return Number(String(process.versions.node).split(".")[0]);
+}
+function nodeVersionOk() {
+  return nodeMajor() >= MIN_NODE_MAJOR;
+}
+
+// 占用判据（与「就绪」分开）：只要 CDP 端口有进程在监听就算占用，
+// 不要求 page target。残留 Chrome 只监听不给 target 时，「就绪」判据会返回
+// 不可用；若拿它判断空闲就会误判并和残留实例争端口。
+async function cdpListening(port, timeoutMs = 1200) {
+  return probeCdp(port, timeoutMs);
+}
+
 module.exports = {
   STATUS_SCHEMA,
   UsageError,
@@ -326,4 +343,7 @@ module.exports = {
   probeCdp,
   listTargets,
   waitForCdp,
+  cdpListening,
+  nodeMajor,
+  nodeVersionOk,
 };

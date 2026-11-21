@@ -22,6 +22,7 @@ const {
   sanitize,
   parseArgs,
   intArg,
+  nodeVersionOk,
   repoRoot,
   statusFilePath,
   readJsonFile,
@@ -113,14 +114,14 @@ async function main() {
   const checks = [];
 
   // ── Node 运行时 ──────────────────────────────────────────────────────────
-  const major = Number(process.versions.node.split(".")[0]);
+  const nodeOk = nodeVersionOk();
   checks.push(
     check(
       "node.version",
       "Node 版本",
-      major >= 22 ? "ok" : "warn",
+      nodeOk ? "ok" : "fail",
       "v" + process.versions.node,
-      major >= 22 ? null : "cdp.js 需要 Node >= 22（全局 WebSocket）"
+      nodeOk ? null : "cdp.js 需要 Node >= 22（全局 WebSocket）"
     )
   );
   const hasFetch =

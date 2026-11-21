@@ -103,7 +103,12 @@ cleanup() {
   fi
   return 0
 }
-trap cleanup EXIT INT TERM
+# INT/TERM 必须 cleanup 后真正退出：bash 收到信号执行完 trap 会从中断处继续，
+# 只挂 cleanup 会让 Ctrl-C 停不下来、跑完整段复测误报「通过」。
+# EXIT 仍保留兜底（正常退出/意外退出都清理）；INT=130、TERM=143 是 shell 约定退出码。
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT
+trap 'cleanup; exit 143' TERM
 
 die() {
   echo "!! $*" >&2
@@ -179,12 +184,18 @@ valid_router_addr() {  # IPv4 或简单主机名；空、带空格/引号/分号
 
 node_major() {
   command -v node >/dev/null 2>&1 || { echo 0; return 0; }
-  node -e 'process.stdout.write(String(process.versions.node.split(".")[0]))' 2>/dev/null || echo 0
+  # 判据收敛到 common.js：Node<22 统一回 0，与 doctor.js 一致。
+  node -e 'const c=require(process.argv[1]);process.stdout.write(String(c.nodeVersionOk()?c.nodeMajor():0))' "$HERE/lib/common.js" 2>/dev/null || echo 0
 }
 
 cdp_probe() {  # 0 = 调试口已就绪（且已有 page target）；非 0 = 不可用
   command -v node >/dev/null 2>&1 || return 3
   node "$HERE/cdp.js" --status --port "$CDP_PORT" >/dev/null 2>&1
+}
+
+cdp_listening() {  # 0 = CDP 端口有人在监听（含无 page target 的残留实例）；与「就绪」判据分开
+  command -v node >/dev/null 2>&1 || return 3
+  node -e 'const c=require(process.argv[1]);c.cdpListening(Number(process.argv[2])).then(v=>process.exit(v.ok?0:1)).catch(()=>process.exit(1))' "$HERE/lib/common.js" "$CDP_PORT" >/dev/null 2>&1
 }
 
 # ── --status：只读体检（不切 WiFi、不 SSH、不起 Chrome、不写文件）───────────
@@ -304,8 +315,8 @@ echo "=== [3/5] 启动临时 Chrome（带调试端口，全新 profile）==="
 # 否则下面的就绪检查会打在旧实例上，抓到的全是过期状态。
 kill_stale_temp_chrome
 sleep 2
-if cdp_probe; then
-  die "CDP 端口 $CDP_PORT 已被其他 Chrome 占用（不是本脚本的临时实例）；请关闭它或换 CDP_PORT"
+if cdp_listening; then
+  die "CDP 端口 $CDP_PORT 已被占用（含无 page target 的残留 Chrome）；本判据=端口在监听，与就绪判据分开。请关闭它或换 CDP_PORT"
 fi
 rm -rf "$TMPPROF"; mkdir -p "$TMPPROF"
 powershell -NoProfile -Command "Start-Process '$CHROME_WIN' -ArgumentList '--remote-debugging-port=$CDP_PORT','--user-data-dir=$TMPPROF_WIN','--no-first-run','--no-default-browser-check','--window-size=1280,800','https://gemini.google.com/app'" 2>/dev/null
