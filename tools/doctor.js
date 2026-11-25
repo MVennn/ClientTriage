@@ -258,16 +258,31 @@ async function main() {
   // 统一状态文件：别的工具写过什么，这里只读地摊开。
   const stFile = statusFilePath();
   const st = readJsonFile(stFile);
-  const sections = st.ok && st.value && st.value.tools ? Object.keys(st.value.tools) : [];
+  // 文件能解析但不是对象（例如被写成 null 或一个标量）时，直接取 st.value.updatedAt 会抛
+  // TypeError，把后面所有检查一起带走 —— 这种情况按「内容异常」提示，其余检查照跑。
+  const stObj = st.ok && st.value && typeof st.value === "object" ? st.value : null;
+  const sections = stObj && stObj.tools ? Object.keys(stObj.tools) : [];
+  let stDetail;
+  let stLevel;
+  if (stObj) {
+    stLevel = "ok";
+    stDetail =
+      sections.length + " 个工具写过（" + (sections.join(", ") || "无") + "），更新于 " + sanitize(stObj.updatedAt, 40);
+  } else if (st.ok) {
+    stLevel = "warn";
+    stDetail =
+      "内容异常（" + sanitize(String(st.value).slice(0, 60), 60) + "），不是 JSON 对象；删掉它或跑一次 tools/cdp.js 重建";
+  } else {
+    stLevel = "warn";
+    stDetail = "还没有（跑过任一工具后生成）";
+  }
   checks.push(
     check(
       "repo.status-file",
       "统一状态文件",
-      st.ok ? "ok" : "warn",
-      st.ok
-        ? sections.length + " 个工具写过（" + (sections.join(", ") || "无") + "），更新于 " + sanitize(st.value.updatedAt, 40)
-        : "还没有（跑过任一工具后生成）",
-      st.ok ? null : ".work/triage-status.json 由各工具运行时写入，不进版本库"
+      stLevel,
+      stDetail,
+      stObj ? null : ".work/triage-status.json 由各工具运行时写入；内容异常时删掉重跑任一工具即可"
     )
   );
 
