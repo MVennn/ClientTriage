@@ -29,7 +29,7 @@ FCM 的出口不一致，会放大上面的现象。
 
 用临时 Chrome 配置（不影响日常配置）打开 uBlock Origin Lite 商店页并点击"添加至 Chrome"：
 
-```
+```json
 PROBE  {"url":"https://chromewebstore.google.com/detail/ublock-origin-lite/...","hasBtn":true,"disabled":false}
 CLICK_ERR null
 TEXT_HITS ["下载时出错: Image decode failed"]
@@ -37,7 +37,7 @@ TEXT_HITS ["下载时出错: Image decode failed"]
 
 抓到的浏览器进程网络日志（netlog）关键事件：
 
-```
+```text
 POST /webstorePrivate.beginInstallWithManifest3
   iconUrl = https://lh3.googleusercontent.com/lsanoOfx5N_t-...
   result  = "icon_error"
@@ -71,7 +71,7 @@ constexpr char kImageDecodeError[] = "Image decode failed";
 用 `--host-resolver-rules="MAP lh3.googleusercontent.com 28.0.0.5"` 把图标域名强制解析到
 **公网地址**后，同样的点击操作：
 
-```
+```text
 result = null        # 不再 icon_error，安装确认框正常弹出
 ```
 
@@ -87,7 +87,7 @@ ShellCrash 当前是 `redir_mod=Redir`：只做 TCP 重定向，UDP 不代理。
 
 实测 conntrack（平板 `<平板LAN-IP>`，以及 PC `<PC-LAN-IP>` 点击安装时）：
 
-```
+```text
 udp src=<平板LAN-IP> dst=198.18.0.140 dport=443 ... [UNREPLIED]   # 无任何回包
 udp src=<PC-LAN-IP> dst=198.18.0.105 dport=443 ... [UNREPLIED]   # 正是 lh3 的 fake-IP
 ```
@@ -126,7 +126,7 @@ Android / Chrome 的 HTTP/3 会等到超时才回落 TCP；Play 商店的下载�
 在 `/etc/ShellCrash/configs/fake_ip_filter`（ShellCrash 官方扩展点，会并入
 `dns.fake-ip-filter`）里加入：
 
-```
+```text
 #Chrome Web Store 安装图标：避免 fake-IP 被 Chrome LNA 判为本地网络
 +.googleusercontent.com
 ```
@@ -154,7 +154,7 @@ ShellCrash 升级会覆盖 `clash_modify.sh`，维护成本高，不如先做方
 
 在 nft 的 prerouting（优先级早于 ShellCrash 的 `dstnat`）加一条**快速拒绝**：
 
-```
+```bash
 table inet quicguard {
   chain pre {
     type filter hook prerouting priority -150; policy accept;

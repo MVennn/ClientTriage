@@ -22,7 +22,7 @@
 
 **通用判据**（三步，顺序不能换）：
 
-```sh
+```bash
 # ① 客户端视角：经路由器代理口测一次（一定要走代理口，不要裸连）
 curl -s -m 15 -x http://10.0.0.1:7890 -o /dev/null \
      -w 'code=%{http_code} redir=%{redirect_url}\n' https://gemini.google.com/
@@ -51,22 +51,22 @@ CDP_PORT=9223 node tools/cdp.js
 打开 `https://gemini.google.com/app`，**只剩一个输入框**：页头、侧栏、推荐区全无。
 无痕模式同样坏；同一个网络下别的浏览器（Electron 内置浏览器）正常。
 
-### 排查步骤
+### 排障步骤
 
-```sh
+```bash
 # ① 抓控制台 —— 看有没有 LNA / CORS 拦截
 CDP_PORT=9223 node tools/cdp.js
 ```
 
 关注输出里这三类：
 
-```
+```json
 [ERROR] Security: Permission was denied for this request to access the `local` address space.
 FAIL type=Script err=net::ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS
 403 ... https://www.gstatic.com/bg3/boq-bard-web/islands/assets/islands-*.js
 ```
 
-```sh
+```bash
 # ② 看 gstatic 解析到的是不是 fake-IP（198.18.0.0/15 / fc00::/16）
 nslookup www.gstatic.com 10.0.0.1
 
@@ -81,7 +81,7 @@ nslookup gemini.google.com 10.0.0.1
 | `www.gstatic.com` → `198.18.x.x` 或 `fc00::…` | **命中本节**（子资源在 fake-IP 里） |
 | `www.gstatic.com` → 真实公网 IP，但仍只剩输入框 | 不是 LNA，往下看「UI 完整性」 |
 
-```sh
+```bash
 # ④ UI 完整性（不要只看截图）
 CDP_PORT=9223 node tools/cdp.js   # 看 "=== 渲染状态 ===" 里 body.innerText 的长度与内容
 ```
@@ -94,7 +94,7 @@ Chrome 155 的 LNA 判成 `public → local` → 被 CORS 拒 → 只剩主 bund
 
 **解法**（路由器侧，`ShellcrashRules` 仓）：
 
-```
+```text
 # /etc/ShellCrash/configs/fake_ip_filter
 +.gstatic.com
 +.googleapis.com
@@ -125,9 +125,9 @@ Chrome 155 的 LNA 判成 `public → local` → 被 CORS 拒 → 只剩主 bund
 在 Chrome 应用商店点「添加至 Chrome」，页面报 **`下载时出错: Image decode failed`**，
 安装确认框不弹。CRX 实际已经下载成功（文件头 `Cr24`，9.1 MB / 77.9 MB 两个包）。
 
-### 排查步骤
+### 排障步骤
 
-```sh
+```bash
 # ① 抓浏览器进程的网络日志（Chrome 必须完全退出后再起）
 "C:/Program Files/Google/Chrome/Application/chrome.exe" \
   --log-net-log=chrome-netlog.json --net-log-capture-mode=Everything \
@@ -139,7 +139,7 @@ grep -i "BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS" chrome-netlog.json
 grep -i "insecure-local-network" chrome-netlog.json
 ```
 
-```sh
+```bash
 # ② 看图标域名解析到哪
 nslookup lh3.googleusercontent.com 10.0.0.1
 ```
@@ -153,7 +153,7 @@ LNA 判 `public → local` → 拒绝（net_error `-385`）→ Chromium 侧 `ico
 
 **解法**（路由器侧）：把图标域名移出 fake-IP：
 
-```
+```text
 # /etc/ShellCrash/configs/fake_ip_filter
 +.googleusercontent.com
 ```
@@ -182,15 +182,15 @@ LNA 判 `public → local` → 拒绝（net_error `-385`）→ Chromium 侧 `ico
 手机 / 平板上的 Google Play 商店：**下载页能进，下载不动，一直转圈**；
 或应用更新永远停在「等待中」。
 
-### 排查步骤
+### 排障步骤
 
-```sh
+```bash
 # ① 看是不是 QUIC 黑洞：在路由器上查 conntrack
 grep "udp.*dport=443" /proc/net/nf_conntrack | head
 #   出现 udp src=10.0.0.x dst=198.18.0.x dport=443 ... [UNREPLIED]  → 命中
 ```
 
-```sh
+```bash
 # ② 客户端侧实测：Play 的 CDN 主机
 curl -s -m 15 -x http://10.0.0.1:7890 -o /dev/null \
      -w 'code=%{http_code} size=%{size_download} time=%{time_total}\n' \
@@ -217,7 +217,7 @@ curl -s -m 15 -x http://10.0.0.1:7890 -o /dev/null -w '%{http_code}\n' \
 - 在 prerouting（早于 ShellCrash 的 `dstnat`）加一张快速拒绝表，让客户端立刻收到 ICMP、
   马上回落 TCP：
 
-  ```
+  ```bash
   table inet quicguard {
     chain pre {
       type filter hook prerouting priority -150; policy accept;
@@ -257,9 +257,9 @@ curl -s -m 15 -x http://10.0.0.1:7890 -o /dev/null -w '%{http_code}\n' \
 - `www.google.com/ncr` 最终域名是 `www.google.com.hk`；
 - 账号侧还有次要条件：**账号本身没有设置国家 / 地区**。
 
-### 排查步骤
+### 排障步骤
 
-```sh
+```bash
 # ① 用服务方自己的国家标记判定（不要用第三方 GeoIP）
 curl -s -m 20 -x http://10.0.0.1:7890 \
   'https://support.google.com/gemini/answer/13575153' \
@@ -273,7 +273,7 @@ curl -s -m 15 -x http://10.0.0.1:7890 -o /dev/null \
 curl -s -m 10 -x http://10.0.0.1:7890 https://api.ipify.org
 ```
 
-```sh
+```bash
 # ④ 客户端侧自检：Chrome 的地区种子与旧地区页面缓存
 node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Local State'); \
   console.log(j.variations_country, j.variations_permanent_consistency_country)"
@@ -321,9 +321,9 @@ node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Loca
 - Netflix / Disney+ / Prime Video / HBO Max 加载不全或片库不对；
 - 视频播不了 / 转圈。
 
-### 排查步骤
+### 排障步骤
 
-```sh
+```bash
 # ① YouTube 主站自己的地区标记（页面里的 gl）
 curl -s -m 15 -x http://10.0.0.1:7890 -A 'Mozilla/5.0' https://www.youtube.com/ \
   | grep -aoE '"(gl|countryCode)":"[A-Z]{2}"' | head -3
@@ -372,9 +372,9 @@ curl -s -m 15 -x http://10.0.0.1:7890 -D- -o /dev/null https://www.netflix.com/ 
 Instagram / Facebook / X / Reddit / Discord / Telegram / LinkedIn / Mastodon
 有的能开、有的加载一半或直接报错（典型是 Reddit 返回 403）。
 
-### 排查步骤
+### 排障步骤
 
-```sh
+```bash
 # ① Meta 自己的国家标记
 curl -s -m 20 -x http://10.0.0.1:7890 https://www.instagram.com/ \
   | grep -aoE '"country_code":"[A-Z]{2}"' | head -1

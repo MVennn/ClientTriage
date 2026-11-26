@@ -82,7 +82,7 @@
 
 **怎么避**：一律用 GET，并显式取 `redirect_url`：
 
-```sh
+```bash
 curl -s -m 15 -x http://127.0.0.1:7890 -o /dev/null -w '%{redirect_url}\n' https://www.google.com/
 ```
 
@@ -105,7 +105,7 @@ curl -s -m 15 -x http://127.0.0.1:7890 -o /dev/null -w '%{redirect_url}\n' https
   能连上就说明网络没问题，别把它当成故障；
 - **要测「客户端视角」，就在客户端侧经 `10.0.0.1:7890` 测**：
 
-  ```sh
+  ```bash
   curl -s -m 15 -x http://10.0.0.1:7890 -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.google.com/
   ```
 
@@ -150,7 +150,7 @@ curl -s -m 15 -x http://127.0.0.1:7890 -o /dev/null -w '%{redirect_url}\n' https
 
 - 健康探测换成**大页面**并截断下载，只测总量与耗时：
 
-  ```sh
+  ```bash
   curl -s -m 20 -x http://10.0.0.1:7890 -o /dev/null \
        --max-filesize 131072 -w '%{size_download} %{time_total}\n' https://gemini.google.com/
   ```
@@ -203,7 +203,7 @@ curl -s -m 15 -x http://127.0.0.1:7890 -o /dev/null -w '%{redirect_url}\n' https
 
 **怎么避**：整页取下来再 grep：
 
-```sh
+```bash
 curl -s -m 20 -x http://10.0.0.1:7890 'https://support.google.com/gemini/answer/13575153' \
   | grep -aoE "var cc='[A-Z]{2}'" | head -1
 ```

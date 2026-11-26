@@ -38,7 +38,7 @@
 
 **每次清完必须复验**，别只信脚本输出：
 
-```sh
+```bash
 # 清完、Chrome 重启后再读一次，确认真的没了
 node -e "const j=require(process.env.LOCALAPPDATA+'/Google/Chrome/User Data/Local State'); \
   console.log(j.variations_country, j.variations_permanent_consistency_country)"

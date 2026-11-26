@@ -68,7 +68,7 @@ Chrome 138 起引入、155 上仍在的 Local Network Access 检查，判据是*
 
 Chrome netlog（`chrome.exe --log-net-log=... --net-log-capture-mode=Everything`）里的关键事件：
 
-```
+```text
 POST /webstorePrivate.beginInstallWithManifest3
   iconUrl = https://lh3.googleusercontent.com/lsanoOfx5N_t-...
   result  = "icon_error"
@@ -91,7 +91,7 @@ constexpr char kImageDecodeError[] = "Image decode failed";
 **反向验证**（决定性）：用 `--host-resolver-rules="MAP lh3.googleusercontent.com 28.0.0.5"`
 把图标域名强制解析到**公网地址**后，同样的点击操作：
 
-```
+```text
 result = null        # 不再 icon_error，安装确认框正常弹出
 ```
 
@@ -112,7 +112,7 @@ LNA 判定 `public → local` → 被 CORS 拒。
 
 **控制台原文**（决定性证据）：
 
-```
+```text
 Access to script at 'https://www.gstatic.com/bg3/boq-bard-web/islands/assets/islands-B2LPY9h5.js'
 from origin 'https://gemini.google.com' has been blocked by CORS policy:
 Permission was denied for this request to access the `local` address space.
@@ -139,7 +139,7 @@ Permission was denied for this request to access the `local` address space.
 **把静态资源域名移出 fake-IP** —— 在路由器的
 `/etc/ShellCrash/configs/fake_ip_filter` 里加：
 
-```
+```text
 +.gstatic.com
 +.googleapis.com
 ```
@@ -147,7 +147,7 @@ Permission was denied for this request to access the `local` address space.
 连同此前为扩展安装 / Play 更新 / FCM / Chrome 更新加的 Google 域，**共 21 条**。
 加完后热更新：
 
-```sh
+```bash
 /etc/ShellCrash/task/task.sh hotupdate
 ```
 

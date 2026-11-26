@@ -1,4 +1,6 @@
 # 凭据与安全须知
+> 占位符语义（`<REDACTED-…>` / `<REPLACE-…>` / `<YOUR-…>`）与豁免统一见跨仓文档 `F:/Project/docs/PLACEHOLDERS.md`（在本仓库外，故意不写成仓内相对链接）。
+
 
 > **一句话**：本仓**不存任何凭据** —— 唯一要用到口令的地方（路由器 SSH）走**兄弟仓**的
 > `askpass.sh`；本篇**只写位置，不写值**，并说明哪些设备标识需要脱敏、怎么脱敏。
@@ -46,7 +48,7 @@
 `tools/verify-gemini.sh` 第 2 步要用 SSH 连路由器（`root@<路由器 IP>`）跑路由器侧检查，
 口令由 **`SSH_ASKPASS`** 提供 —— 但它**不自己读口令**，只指向一个脚本：
 
-```
+```text
 tools/verify-gemini.sh
   └─ SSH_ASKPASS = $HERE/../../<兄弟仓>/recovery/local-tools/askpass.sh
 ```
@@ -139,7 +141,7 @@ tools/verify-gemini.sh
 
 ## 4. 上传公开仓库前的检查清单
 
-```sh
+```bash
 # 1) 确认没有把凭据文件带进去
 git ls-files | grep -E '\.(key|crt|pem|p12|pfx)$|\.env$|askpass\.sh|\.router-password'
 
@@ -201,7 +203,7 @@ git diff --cached | grep -nE 'C:[/\\]Users[/\\]|/Users/[A-Za-z0-9._-]+/|[A-Za-z0
 
 ---
 
-# 推送前脱敏规则（通用）
+## 推送前脱敏规则（通用）
 
 > **一句话**：推送前跑一次 `python tools/check-secrets.py`；它拦的是三类东西 ——
 > 可用凭据、本机用户目录、真实邮箱。规则对 8 个仓完全一致，一处改全局同步。
@@ -279,7 +281,7 @@ git diff --cached | grep -nE 'C:[/\\]Users[/\\]|/Users/[A-Za-z0-9._-]+/|[A-Za-z0
 
 ## 5. 推送前怎么做
 
-```sh
+```bash
 # 1) 扫已跟踪文件（CI 跑的就是这个，退出码 0 才能推）
 python tools/check-secrets.py
 
